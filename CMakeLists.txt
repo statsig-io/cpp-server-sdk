@@ -15,16 +15,16 @@ include(${CMAKE_FILES}/json.cmake)
 
 # Create object libraries so that they may be packaged
 # into a single statsig library instead of being separate dependencies
-# file(GLOB HTTPLIB_SRC ${httplib_SOURCE_DIR})
-# file(GLOB JSON_SRC ${json_SOURCE_DIR})
-# add_library(json-target OBJECT ${HTTPLIB_SRC})
-# add_library(httplib-target OBJECT ${json_SOURCE_DIR})
+file(GLOB HTTPLIB_SRC ${httplib_SOURCE_DIR})
+file(GLOB JSON_SRC ${json_SOURCE_DIR})
+add_library(json-target OBJECT ${HTTPLIB_SRC})
+add_library(httplib-target OBJECT ${json_SOURCE_DIR})
 
 # Define the main statsig target.
 file(GLOB STATSIG_SOURCE_FILES "src/*")
 add_library(Statsig
-  # $<TARGET_OBJECTS:httplib-target>
-  # $<TARGET_OBJECTS:json-target>
+  $<TARGET_OBJECTS:httplib-target>
+  $<TARGET_OBJECTS:json-target>
   ${STATSIG_SOURCE_FILES}
 )
 

@@ -162,6 +162,32 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named json-target
+
+# Build rule for target.
+json-target: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 json-target
+.PHONY : json-target
+
+# fast build rule for target.
+json-target/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/json-target.dir/build.make CMakeFiles/json-target.dir/build
+.PHONY : json-target/fast
+
+#=============================================================================
+# Target rules for targets named httplib-target
+
+# Build rule for target.
+httplib-target: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 httplib-target
+.PHONY : httplib-target
+
+# fast build rule for target.
+httplib-target/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/httplib-target.dir/build.make CMakeFiles/httplib-target.dir/build
+.PHONY : httplib-target/fast
+
+#=============================================================================
 # Target rules for targets named Statsig
 
 # Build rule for target.
@@ -345,6 +371,8 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... Statsig"
 	@echo "... httplib"
+	@echo "... httplib-target"
+	@echo "... json-target"
 	@echo "... src/client.o"
 	@echo "... src/client.i"
 	@echo "... src/client.s"
