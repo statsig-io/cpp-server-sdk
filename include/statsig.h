@@ -3,6 +3,8 @@
 #include "client.h"
 #include "evaluator.h"
 #include "types.h"
+#include <nlohmann/json.hpp>
+#include <httplib.h>
 
 namespace statsig
 {
