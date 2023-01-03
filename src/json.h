@@ -10,7 +10,7 @@ namespace nlohmann
 {
   // JSON serialization
   template <typename T>
-  void to_json(nlohmann::json &j, const std::optional<T> &v)
+  inline void to_json(nlohmann::json &j, const std::optional<T> &v)
   {
     if (v.has_value())
       j = *v;
@@ -20,7 +20,7 @@ namespace nlohmann
 
   // JSON deserialization
   template <typename T>
-  void from_json(const nlohmann::json &j, std::optional<T> &v)
+  inline void from_json(const nlohmann::json &j, std::optional<T> &v)
   {
     if (j.is_null())
       v = std::nullopt;
@@ -29,13 +29,13 @@ namespace nlohmann
   }
 
   template <typename T>
-  void from_json(const nlohmann::json &j, std::vector<T> &v)
+  inline void from_json(const nlohmann::json &j, std::vector<T> &v)
   {
     v = j.get<std::vector<T>>();
   }
 
   // No easy way to support a generic variant template. Manually specify possible variants here:
-  void from_json(const nlohmann::json &j, std::variant<int, float, double> &v)
+  inline void from_json(const nlohmann::json &j, std::variant<int, float, double> &v)
   {
     if (std::get_if<int>(&v))
     {
@@ -51,7 +51,7 @@ namespace nlohmann
     }
   }
 
-  void from_json(const nlohmann::json &j, std::variant<std::vector<std::string>, std::vector<statsig::number>, std::string, statsig::number> &v)
+  inline void from_json(const nlohmann::json &j, std::variant<std::vector<std::string>, std::vector<statsig::number>, std::string, statsig::number> &v)
   {
     if (std::get_if<std::vector<std::string>>(&v))
     {
@@ -71,7 +71,7 @@ namespace nlohmann
     }
   }
 
-  void from_json(const nlohmann::json &j, std::variant<bool, nlohmann::json> &v)
+  inline void from_json(const nlohmann::json &j, std::variant<bool, nlohmann::json> &v)
   {
     if (std::get_if<bool>(&v))
     {
@@ -83,7 +83,7 @@ namespace nlohmann
     }
   }
 
-  void from_json(const nlohmann::json &j, statsig::ConfigCondition &v)
+  inline void from_json(const nlohmann::json &j, statsig::ConfigCondition &v)
   {
     j.at("type").get_to(v.type);
     j.at("operator").get_to(v.oper);
@@ -94,7 +94,7 @@ namespace nlohmann
     j.at("isDeviceBased").get_to(v.isDeviceBased);
   }
 
-  void from_json(const nlohmann::json &j, statsig::ConfigRule &v)
+  inline void from_json(const nlohmann::json &j, statsig::ConfigRule &v)
   {
     j.at("name").get_to(v.name);
     j.at("id").get_to(v.id);
@@ -107,7 +107,7 @@ namespace nlohmann
     j.at("isExperimentGroup").get_to(v.isExperimentGroup);
   }
 
-  void from_json(const nlohmann::json &j, statsig::ConfigSpec &v)
+  inline void from_json(const nlohmann::json &j, statsig::ConfigSpec &v)
   {
     j.at("name").get_to(v.name);
     j.at("type").get_to(v.type);
@@ -124,7 +124,7 @@ namespace nlohmann
 
   // Special case where the input json is actually a list of ConfigSpec objects
   // However, we parse it into a map indexed by the name field
-  void from_json(const nlohmann::json &j, std::unordered_map<std::string, statsig::ConfigSpec> &v)
+  inline void from_json(const nlohmann::json &j, std::unordered_map<std::string, statsig::ConfigSpec> &v)
   {
     try
     {

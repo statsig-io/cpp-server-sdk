@@ -3,7 +3,16 @@
 
 namespace statsig
 {
-  void Statsig::initialize(std::string sdkKey, Options options = Options())
+  void Statsig::initialize(std::string sdkKey)
+  {
+    if (isInitialized())
+    {
+      return;
+    }
+    client = new Client(sdkKey);
+  }
+
+  void Statsig::initialize(std::string sdkKey, Options options)
   {
     if (isInitialized())
     {
