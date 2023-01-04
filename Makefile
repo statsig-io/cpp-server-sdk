@@ -175,6 +175,19 @@ Statsig/fast:
 .PHONY : Statsig/fast
 
 #=============================================================================
+# Target rules for targets named test_statsig
+
+# Build rule for target.
+test_statsig: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_statsig
+.PHONY : test_statsig
+
+# fast build rule for target.
+test_statsig/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_statsig.dir/build.make CMakeFiles/test_statsig.dir/build
+.PHONY : test_statsig/fast
+
+#=============================================================================
 # Target rules for targets named httplib
 
 # Build rule for target.
@@ -331,6 +344,30 @@ src/utils.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Statsig.dir/build.make CMakeFiles/Statsig.dir/src/utils.cpp.s
 .PHONY : src/utils.cpp.s
 
+tests/test-initialize.o: tests/test-initialize.cpp.o
+.PHONY : tests/test-initialize.o
+
+# target to build an object file
+tests/test-initialize.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_statsig.dir/build.make CMakeFiles/test_statsig.dir/tests/test-initialize.cpp.o
+.PHONY : tests/test-initialize.cpp.o
+
+tests/test-initialize.i: tests/test-initialize.cpp.i
+.PHONY : tests/test-initialize.i
+
+# target to preprocess a source file
+tests/test-initialize.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_statsig.dir/build.make CMakeFiles/test_statsig.dir/tests/test-initialize.cpp.i
+.PHONY : tests/test-initialize.cpp.i
+
+tests/test-initialize.s: tests/test-initialize.cpp.s
+.PHONY : tests/test-initialize.s
+
+# target to generate assembly for a file
+tests/test-initialize.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_statsig.dir/build.make CMakeFiles/test_statsig.dir/tests/test-initialize.cpp.s
+.PHONY : tests/test-initialize.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -345,6 +382,7 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... Statsig"
 	@echo "... httplib"
+	@echo "... test_statsig"
 	@echo "... src/client.o"
 	@echo "... src/client.i"
 	@echo "... src/client.s"
@@ -363,6 +401,9 @@ help:
 	@echo "... src/utils.o"
 	@echo "... src/utils.i"
 	@echo "... src/utils.s"
+	@echo "... tests/test-initialize.o"
+	@echo "... tests/test-initialize.i"
+	@echo "... tests/test-initialize.s"
 .PHONY : help
 
 

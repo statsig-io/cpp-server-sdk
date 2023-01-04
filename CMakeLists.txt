@@ -42,3 +42,7 @@ target_link_libraries(Statsig PUBLIC ${Boost_LIBRARIES})
 add_library(Statsig::cpp ALIAS Statsig)
 
 target_compile_features(Statsig PUBLIC cxx_std_17)
+
+add_executable(test_statsig ${CMAKE_CURRENT_SOURCE_DIR}/tests/test-initialize.cpp)
+target_compile_features(test_statsig PRIVATE cxx_std_17)
+target_link_libraries(test_statsig PRIVATE Statsig)

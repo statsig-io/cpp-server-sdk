@@ -2,19 +2,23 @@
 
 namespace statsig
 {
-  httplib::Result Network::postRequest(std::string endpoint, std::multimap<std::string, std::any> body)
+  void Network::shutdown()
   {
-    return Network::postRequest(endpoint, Utils::mapToJsonString<std::string, std::any>(body));
+  }
+
+  httplib::Result Network::postRequest(std::string endpoint, std::multimap<std::string, JSON::any> body)
+  {
+    return Network::postRequest(endpoint, Utils::mapToJsonString<std::string, JSON::any>(body));
   }
 
   httplib::Result Network::postRequest(std::string endpoint, std::string body)
   {
-    httplib::Client client(api);
+    httplib::Client client(this->api);
     auto currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(
                            std::chrono::system_clock::now().time_since_epoch())
                            .count();
     httplib::Headers headers = {
-        {"STATSIG-API-KEY", sdkKey},
+        {"STATSIG-API-KEY", this->sdkKey},
         {"STATSIG-CLIENT-TIME", std::to_string(currentTime)},
         {"STATSIG-SERVER-SESSION-ID", Utils::genUUIDString()},
         {"STATSIG-SDK-TYPE", StatsigMetadata.sdkType},

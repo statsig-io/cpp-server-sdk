@@ -4,18 +4,21 @@ namespace statsig
 {
   bool Client::checkGate(User user, std::string gate)
   {
-    // const res = evaluator->checkGate();
-    // if (res.fetchFromServer)
-    return false;
+    auto res = this->evaluator->checkGate(user, gate);
+    return res.booleanValue;
   }
 
   DynamicConfig Client::getConfig(User user, std::string config)
   {
-    // return client->getConfig(user, config);
-    return DynamicConfig();
+    auto res = this->evaluator->getConfig(user, config);
+    return res.configValue;
   }
 
   void Client::shutdown()
   {
+    this->network->shutdown();
+    this->evaluator->shutdown();
+    this->network = NULL;
+    this->evaluator = NULL;
   }
 }

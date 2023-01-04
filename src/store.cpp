@@ -2,51 +2,60 @@
 
 namespace statsig
 {
+  void Store::initialize()
+  {
+    Store::fetchConfigSpecs();
+  }
+
+  void Store::shutdown()
+  {
+  }
+
   std::optional<ConfigSpec> Store::getGate(std::string gateName)
   {
-    return Utils::safeGetMap<std::string, ConfigSpec>(featureGates, gateName);
+    return Utils::safeGetMap<std::string, ConfigSpec>(this->featureGates, gateName);
   }
 
   std::optional<ConfigSpec> Store::getConfig(std::string configName)
   {
-    return Utils::safeGetMap<std::string, ConfigSpec>(dynamicConfigs, configName);
+    return Utils::safeGetMap<std::string, ConfigSpec>(this->dynamicConfigs, configName);
   }
 
   std::optional<ConfigSpec> Store::getLayer(std::string layerName)
   {
-    return Utils::safeGetMap<std::string, ConfigSpec>(layerConfigs, layerName);
+    return Utils::safeGetMap<std::string, ConfigSpec>(this->layerConfigs, layerName);
   }
 
   std::optional<std::string> Store::getExperimentLayer(std::string experimentName)
   {
-    return Utils::safeGetMap<std::string, std::string>(experimentToLayer, experimentName);
+    return Utils::safeGetMap<std::string, std::string>(this->experimentToLayer, experimentName);
   }
 
   void Store::fetchConfigSpecs()
   {
-    std::multimap<std::string, std::any> body = {
+    std::multimap<std::string, JSON::any> body = {
         // {"statsigMetadata", nlohmann::json::parse(StatsigMetadata)},
         {"statsigMetadata", StatsigMetadata},
         {"sinceTime", 0},
     };
-    auto res = network->postRequest("/download_config_specs", body);
+    auto res = this->network->postRequest("/download_config_specs", body);
     if (res->status != 200)
     {
       return;
     }
     try
     {
-      json specsJSON = json::parse(res->body);
+      nlohmann::json specsJSON = nlohmann::json::parse(res->body);
       Store::processSpecsJSON(specsJSON);
     }
-    catch (json::parse_error &e)
+    catch (nlohmann::json::parse_error &e)
     {
       // TODO: Log SDK exception
       std::cout << e.what() << std::endl;
     }
   }
 
-  void Store::processSpecsJSON(json specsJSON)
+  void Store::processSpecsJSON(nlohmann::json specsJSON)
   {
     try
     {
@@ -66,6 +75,7 @@ namespace statsig
       this->dynamicConfigs = specsJSON.at("dynamic_configs").get_to(this->dynamicConfigs);
       this->layerConfigs = specsJSON.at("layer_configs").get_to(this->layerConfigs);
       this->experimentToLayer = specsJSON.at("layers").get_to(this->experimentToLayer); // TODO: reverse mapping
+      std::cout << specsJSON << std::endl;
     }
     catch (...)
     {

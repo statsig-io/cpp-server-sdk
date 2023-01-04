@@ -5,12 +5,14 @@
 #include "types.h"
 #include <nlohmann/json.hpp>
 #include <httplib.h>
+#include <iostream>
 
 namespace statsig
 {
   class Statsig
   {
   public:
+    Statsig() : client(NULL){};
     void initialize(std::string sdkKey);
     void initialize(std::string sdkKey, Options options);
     bool checkGate(User user, std::string gate);

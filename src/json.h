@@ -4,11 +4,24 @@
 
 #include "types.h"
 
-using json = nlohmann::json;
+namespace JSON
+{
+  // json::any -- types that are supported by json conversion
+  // We cannot use generic std::any because we need to define how to convert each non-STL type
+  using any = std::variant<
+      bool,
+      int,
+      float,
+      double,
+      std::string,
+      struct statsig::StatsigMetadata>;
+}
 
 namespace nlohmann
 {
+  // ------------------
   // JSON serialization
+  // ------------------
   template <typename T>
   inline void to_json(nlohmann::json &j, const std::optional<T> &v)
   {
@@ -18,7 +31,62 @@ namespace nlohmann
       j = nullptr;
   }
 
+  inline void to_json(nlohmann::json &j, const struct statsig::StatsigMetadata &v)
+  {
+    j = json{
+        {"sdkType", v.sdkType},
+        {"sdkVersion", v.sdkVersion},
+    };
+  }
+
+  inline void to_json(nlohmann::json &j, const JSON::any &v)
+  {
+    if (const bool *maybeBool = std::get_if<bool>(&v))
+    {
+      j = *maybeBool;
+    }
+    else if (const int *maybeInt = std::get_if<int>(&v))
+    {
+      j = *maybeInt;
+    }
+    else if (const float *maybeFloat = std::get_if<float>(&v))
+    {
+      j = *maybeFloat;
+    }
+    else if (const double *maybeDouble = std::get_if<double>(&v))
+    {
+      j = *maybeDouble;
+    }
+    else if (const std::string *maybeString = std::get_if<std::string>(&v))
+    {
+      j = *maybeString;
+    }
+    else if (const struct statsig::StatsigMetadata *maybeStatsigMetadata = std::get_if<struct statsig::StatsigMetadata>(&v))
+    {
+      j = *maybeStatsigMetadata;
+    }
+  }
+
+  template <typename K, typename V>
+  inline void to_json(nlohmann::json &j, const std::variant<std::map<K, V>, std::unordered_map<K, V>, std::multimap<K, V>> &v)
+  {
+    if (const std::map<K, V> *maybeMap = std::get_if<std::map<K, V>>(&v))
+    {
+      j = *maybeMap;
+    }
+    else if (const std::unordered_map<K, V> *maybeUnorderedMap = std::get_if<std::unordered_map<K, V>>(&v))
+    {
+      j = *maybeUnorderedMap;
+    }
+    else if (const std::multimap<K, V> *maybeMultimap = std::get_if<std::multimap<K, V>>(&v))
+    {
+      j = *maybeMultimap;
+    }
+  }
+
+  // --------------------
   // JSON deserialization
+  // --------------------
   template <typename T>
   inline void from_json(const nlohmann::json &j, std::optional<T> &v)
   {
@@ -73,13 +141,13 @@ namespace nlohmann
 
   inline void from_json(const nlohmann::json &j, std::variant<bool, nlohmann::json> &v)
   {
-    if (std::get_if<bool>(&v))
+    if (const bool *maybeBool = std::get_if<bool>(&v))
     {
-      v = j.get<bool>();
+      v = *maybeBool;
     }
-    else if (std::get_if<nlohmann::json>(&v))
+    else if (const nlohmann::json *maybeJson = std::get_if<nlohmann::json>(&v))
     {
-      v = j.get<nlohmann::json>();
+      v = *maybeJson;
     }
   }
 
