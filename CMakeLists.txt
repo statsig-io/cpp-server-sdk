@@ -21,7 +21,11 @@ target_include_directories(Statsig
 )
 
 # Contains various cmake target files for 3rd party libraries
-set(CMAKE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+set(CMAKE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
+# Default system variables needed for dependencies
+# NOTE: These will likely need to be overriden when importing this library
+set(OPENSSL_ROOT_DIR /opt/homebrew/opt/openssl@3)
 
 # Download 3rd party libraries.
 include(FetchContent)
@@ -36,6 +40,9 @@ target_link_libraries(Statsig PUBLIC nlohmann_json::nlohmann_json)
 find_package(Boost REQUIRED)
 target_include_directories(Statsig PUBLIC ${Boost_INCLUDE_DIRS})
 target_link_libraries(Statsig PUBLIC ${Boost_LIBRARIES})
+find_package(OpenSSL REQUIRED)
+target_include_directories(Statsig PUBLIC ${OpenSSL_INCLUDE_DIRS})
+target_link_libraries(Statsig PUBLIC ${OpenSSL_LIBRARIES})
 
 # Allow linking against the target Statsig::cpp when using find_package, or when
 # using add_subdirectory.

@@ -15,7 +15,7 @@ namespace statsig
   struct Options
   {
     std::string api;
-    Options() : api("https://statsigapi.net/v1"){};
+    Options() : api("https://statsigapi.net"){};
   };
 
   struct User
@@ -37,13 +37,11 @@ namespace statsig
              userAgent(""),
              country(""),
              locale(""),
-             appVersion("")
-    {
-      custom = std::unordered_map<std::string, std::any>();
-      privateAttribute = std::unordered_map<std::string, std::any>();
-      statsigEnvironment = std::unordered_map<std::string, std::string>();
-      customIDs = std::unordered_map<std::string, std::string>();
-    }
+             appVersion(""),
+             custom(std::unordered_map<std::string, std::any>()),
+             privateAttribute(std::unordered_map<std::string, std::any>()),
+             statsigEnvironment(std::unordered_map<std::string, std::string>()),
+             customIDs(std::unordered_map<std::string, std::string>()){}
   };
 
   struct DynamicConfig
@@ -51,13 +49,9 @@ namespace statsig
     std::string name;
     std::unordered_map<std::string, std::any> value;
     std::string ruleID;
-    // DynamicConfig() : name(""), value({}), ruleID(""){}
-    DynamicConfig()
-    {
-      name = "";
-      value = std::unordered_map<std::string, std::any>();
-      ruleID = "";
-    };
+    DynamicConfig() : name(""),
+                      value(std::unordered_map<std::string, std::any>()),
+                      ruleID("") {}
   };
 
   struct Event
@@ -67,11 +61,11 @@ namespace statsig
     std::string value;
     std::unordered_map<std::string, std::string> metadata;
     int time;
-    // Event() : eventName(""), user(User()), value(""), metadata({}), time(0){};
-    Event() : eventName(""), user(User()), value(""), time(0)
-    {
-      metadata = std::unordered_map<std::string, std::string>();
-    };
+    Event() : eventName(""),
+              user(User()),
+              value(""),
+              metadata(std::unordered_map<std::string, std::string>()),
+              time(0){};
   };
 
   struct EvalResult
@@ -83,23 +77,13 @@ namespace statsig
     std::vector<std::unordered_map<std::string, std::string>> undelegatedSecondaryExposures;
     std::unordered_map<std::string, bool> explicitParameters;
     bool isExperimentGroup;
-    // EvalResult() : fetchFromServer(false),
-    //                booleanValue(false),
-    //                configValue(DynamicConfig()),
-    //                secondaryExposures({}),
-    //                undelegatedSecondaryExposures({}),
-    //                explicitParameters({}),
-    //                isExperimentGroup(false){};
-    EvalResult()
-    {
-      fetchFromServer = false;
-      booleanValue = false;
-      configValue = DynamicConfig();
-      secondaryExposures = std::vector<std::unordered_map<std::string, std::string>>();
-      undelegatedSecondaryExposures = std::vector<std::unordered_map<std::string, std::string>>();
-      explicitParameters = std::unordered_map<std::string, bool>();
-      isExperimentGroup = false;
-    };
+    EvalResult() : fetchFromServer(false),
+                   booleanValue(false),
+                   configValue(DynamicConfig()),
+                   secondaryExposures(std::vector<std::unordered_map<std::string, std::string>>()),
+                   undelegatedSecondaryExposures(std::vector<std::unordered_map<std::string, std::string>>()),
+                   explicitParameters(std::unordered_map<std::string, bool>()),
+                   isExperimentGroup(false){};
   };
 
   struct ConfigCondition
@@ -169,38 +153,4 @@ namespace statsig
                    isActive(std::nullopt),
                    hasSharedParams(std::nullopt){};
   };
-
-  // NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(
-  //     ConfigCondition,
-  //     type,
-  //     oper,
-  //     field,
-  //     targetValue,
-  //     additionalValues,
-  //     idType,
-  //     isDeviceBased);
-  // NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(
-  //     ConfigRule,
-  //     name,
-  //     id,
-  //     salt,
-  //     passPercentage,
-  //     conditions,
-  //     returnValue,
-  //     idType,
-  //     configDelegate,
-  //     isExperimentGroup);
-  // NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(
-  //     statsig::ConfigSpec,
-  //     name,
-  //     type,
-  //     salt,
-  //     enabled,
-  //     rules,
-  //     defaultValue,
-  //     idType,
-  //     explicitParameters,
-  //     entity,
-  //     isActive,
-  //     hasSharedParams);
 }

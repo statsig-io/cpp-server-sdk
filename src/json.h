@@ -88,6 +88,27 @@ namespace nlohmann
   // JSON deserialization
   // --------------------
   template <typename T>
+  inline void json_safe_deserialize(const nlohmann::json j, std::string key, T &v)
+  {
+    if (j.contains(key))
+    {
+      j.at(key).get_to(v);
+    }
+  }
+
+  template <typename T>
+  inline void type_safe_deserialize(const nlohmann::json j, T &v)
+  {
+    try
+    {
+      v = j.get<T>();
+    }
+    catch (nlohmann::json::type_error &e)
+    {
+    }
+  }
+
+  template <typename T>
   inline void from_json(const nlohmann::json &j, std::optional<T> &v)
   {
     if (j.is_null())
@@ -96,98 +117,92 @@ namespace nlohmann
       v = j.get<T>();
   }
 
-  template <typename T>
-  inline void from_json(const nlohmann::json &j, std::vector<T> &v)
-  {
-    v = j.get<std::vector<T>>();
-  }
-
   // No easy way to support a generic variant template. Manually specify possible variants here:
   inline void from_json(const nlohmann::json &j, std::variant<int, float, double> &v)
   {
-    if (std::get_if<int>(&v))
+    if (int *maybeInt = std::get_if<int>(&v))
     {
-      v = j.get<int>();
+      type_safe_deserialize(j, *maybeInt);
     }
-    else if (std::get_if<float>(&v))
+    else if (float *maybeFloat = std::get_if<float>(&v))
     {
-      v = j.get<float>();
+      type_safe_deserialize(j, *maybeFloat);
     }
-    else if (std::get_if<double>(&v))
+    else if (double *maybeDouble = std::get_if<double>(&v))
     {
-      v = j.get<double>();
+      type_safe_deserialize(j, *maybeDouble);
     }
   }
 
   inline void from_json(const nlohmann::json &j, std::variant<std::vector<std::string>, std::vector<statsig::number>, std::string, statsig::number> &v)
   {
-    if (std::get_if<std::vector<std::string>>(&v))
+    if (std::vector<std::string> *maybeVecString = std::get_if<std::vector<std::string>>(&v))
     {
-      v = j.get<std::vector<std::string>>();
+      type_safe_deserialize(j, *maybeVecString);
     }
-    else if (std::get_if<std::vector<statsig::number>>(&v))
+    else if (std::vector<statsig::number> *maybeVecNumber = std::get_if<std::vector<statsig::number>>(&v))
     {
-      v = j.get<std::vector<statsig::number>>();
+      type_safe_deserialize(j, *maybeVecNumber);
     }
-    else if (std::get_if<std::string>(&v))
+    else if (std::string *maybeString = std::get_if<std::string>(&v))
     {
-      v = j.get<std::string>();
+      type_safe_deserialize(j, *maybeString);
     }
-    else if (std::get_if<statsig::number>(&v))
+    else if (statsig::number *maybeNumber = std::get_if<statsig::number>(&v))
     {
-      v = j.get<statsig::number>();
+      type_safe_deserialize(j, *maybeNumber);
     }
   }
 
   inline void from_json(const nlohmann::json &j, std::variant<bool, nlohmann::json> &v)
   {
-    if (const bool *maybeBool = std::get_if<bool>(&v))
+    if (bool *maybeBool = std::get_if<bool>(&v))
     {
-      v = *maybeBool;
+      type_safe_deserialize(j, *maybeBool);
     }
-    else if (const nlohmann::json *maybeJson = std::get_if<nlohmann::json>(&v))
+    else if (nlohmann::json *maybeJson = std::get_if<nlohmann::json>(&v))
     {
-      v = *maybeJson;
+      type_safe_deserialize(j, *maybeJson);
     }
   }
 
   inline void from_json(const nlohmann::json &j, statsig::ConfigCondition &v)
   {
-    j.at("type").get_to(v.type);
-    j.at("operator").get_to(v.oper);
-    j.at("field").get_to(v.field);
-    j.at("targetValue").get_to(v.targetValue);
-    j.at("additionalValues").get_to(v.additionalValues);
-    j.at("idType").get_to(v.idType);
-    j.at("isDeviceBased").get_to(v.isDeviceBased);
+    json_safe_deserialize(j, "type", v.type);
+    json_safe_deserialize(j, "operator", v.oper);
+    json_safe_deserialize(j, "field", v.field);
+    json_safe_deserialize(j, "targetValue", v.targetValue);
+    json_safe_deserialize(j, "additionalValues", v.additionalValues);
+    json_safe_deserialize(j, "idType", v.idType);
+    json_safe_deserialize(j, "isDeviceBased", v.isDeviceBased);
   }
 
   inline void from_json(const nlohmann::json &j, statsig::ConfigRule &v)
   {
-    j.at("name").get_to(v.name);
-    j.at("id").get_to(v.id);
-    j.at("salt").get_to(v.salt);
-    j.at("passPercentage").get_to(v.passPercentage);
-    j.at("conditions").get_to(v.conditions);
-    j.at("returnValue").get_to(v.returnValue);
-    j.at("idType").get_to(v.idType);
-    j.at("configDelegate").get_to(v.configDelegate);
-    j.at("isExperimentGroup").get_to(v.isExperimentGroup);
+    json_safe_deserialize(j, "name", v.name);
+    json_safe_deserialize(j, "id", v.id);
+    json_safe_deserialize(j, "salt", v.salt);
+    json_safe_deserialize(j, "passPercentage", v.passPercentage);
+    json_safe_deserialize(j, "conditions", v.conditions);
+    json_safe_deserialize(j, "returnValue", v.returnValue);
+    json_safe_deserialize(j, "idType", v.idType);
+    json_safe_deserialize(j, "configDelegate", v.configDelegate);
+    json_safe_deserialize(j, "isExperimentGroup", v.isExperimentGroup);
   }
 
   inline void from_json(const nlohmann::json &j, statsig::ConfigSpec &v)
   {
-    j.at("name").get_to(v.name);
-    j.at("type").get_to(v.type);
-    j.at("salt").get_to(v.salt);
-    j.at("enabled").get_to(v.enabled);
-    j.at("rules").get_to(v.rules);
-    j.at("defaultValue").get_to(v.defaultValue);
-    j.at("idType").get_to(v.idType);
-    j.at("explicitParameters").get_to(v.explicitParameters);
-    j.at("entity").get_to(v.entity);
-    j.at("isActive").get_to(v.isActive);
-    j.at("hasSharedParams").get_to(v.hasSharedParams);
+    json_safe_deserialize(j, "name", v.name);
+    json_safe_deserialize(j, "type", v.type);
+    json_safe_deserialize(j, "salt", v.salt);
+    json_safe_deserialize(j, "enabled", v.enabled);
+    json_safe_deserialize(j, "rules", v.rules);
+    json_safe_deserialize(j, "defaultValue", v.defaultValue);
+    json_safe_deserialize(j, "idType", v.idType);
+    json_safe_deserialize(j, "explicitParameters", v.explicitParameters);
+    json_safe_deserialize(j, "entity", v.entity);
+    json_safe_deserialize(j, "isActive", v.isActive);
+    json_safe_deserialize(j, "hasSharedParams", v.hasSharedParams);
   }
 
   // Special case where the input json is actually a list of ConfigSpec objects
@@ -196,15 +211,14 @@ namespace nlohmann
   {
     try
     {
-      auto configSpecs = j.get<std::vector<statsig::ConfigSpec>>();
+      std::vector<statsig::ConfigSpec> configSpecs = j.get<std::vector<statsig::ConfigSpec>>();
       for (auto spec : configSpecs)
       {
-        v[spec.name] = spec;
+        v.insert({spec.name, spec});
       }
     }
     catch (...)
-    { // fallback to standard serializer
-      v = j.get<std::unordered_map<std::string, statsig::ConfigSpec>>();
+    {
     }
   }
 }

@@ -1,5 +1,4 @@
-set(HTTPLIB_USE_OPENSSL_IF_AVAILABLE OFF)
-set(HTTPLIB_COMPILE ON)
+set(HTTPLIB_REQUIRE_OPENSSL ON)
 
 FetchContent_Declare(httplib
   GIT_REPOSITORY    https://github.com/yhirose/cpp-httplib.git

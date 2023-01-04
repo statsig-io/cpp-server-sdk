@@ -187,19 +187,6 @@ test_statsig/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_statsig.dir/build.make CMakeFiles/test_statsig.dir/build
 .PHONY : test_statsig/fast
 
-#=============================================================================
-# Target rules for targets named httplib
-
-# Build rule for target.
-httplib: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 httplib
-.PHONY : httplib
-
-# fast build rule for target.
-httplib/fast:
-	$(MAKE) $(MAKESILENT) -f _deps/httplib-build/CMakeFiles/httplib.dir/build.make _deps/httplib-build/CMakeFiles/httplib.dir/build
-.PHONY : httplib/fast
-
 src/client.o: src/client.cpp.o
 .PHONY : src/client.o
 
@@ -381,7 +368,6 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... Statsig"
-	@echo "... httplib"
 	@echo "... test_statsig"
 	@echo "... src/client.o"
 	@echo "... src/client.i"

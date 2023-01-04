@@ -34,11 +34,10 @@ namespace statsig
   void Store::fetchConfigSpecs()
   {
     std::multimap<std::string, JSON::any> body = {
-        // {"statsigMetadata", nlohmann::json::parse(StatsigMetadata)},
         {"statsigMetadata", StatsigMetadata},
         {"sinceTime", 0},
     };
-    auto res = this->network->postRequest("/download_config_specs", body);
+    auto res = this->network->postRequest("/v1/download_config_specs", body);
     if (res->status != 200)
     {
       return;
@@ -64,18 +63,10 @@ namespace statsig
         return;
       }
 
-      // auto featureGatesListJson = specsJSON.at("feature_gates").get_to(this->featureGates);
-      // auto featureGatesListJson = specsJSON.at("feature_gates").get<std::vector<ConfigSpec>>();
-      // auto gatesList = featureGatesListJson.get<std::vector<ConfigSpec>>();
-      // auto dynamicConfigsListJson = specsJSON.at("dynamic_configs");
-      // auto layerConfigsListJson = specsJSON.at("layer_configs");
-      // auto experimentToLayerJson = specsJSON.at("layers");
-
-      this->featureGates = specsJSON.at("feature_gates").get_to(this->featureGates);
-      this->dynamicConfigs = specsJSON.at("dynamic_configs").get_to(this->dynamicConfigs);
-      this->layerConfigs = specsJSON.at("layer_configs").get_to(this->layerConfigs);
-      this->experimentToLayer = specsJSON.at("layers").get_to(this->experimentToLayer); // TODO: reverse mapping
-      std::cout << specsJSON << std::endl;
+      specsJSON.at("feature_gates").get_to(this->featureGates);
+      specsJSON.at("dynamic_configs").get_to(this->dynamicConfigs);
+      specsJSON.at("layer_configs").get_to(this->layerConfigs);
+      specsJSON.at("layers").get_to(this->experimentToLayer); // TODO: reverse mapping
     }
     catch (...)
     {
