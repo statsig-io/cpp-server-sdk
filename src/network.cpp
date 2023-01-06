@@ -14,9 +14,7 @@ namespace statsig
   httplib::Result Network::postRequest(std::string endpoint, std::string body)
   {
     httplib::Client client(this->api);
-    auto currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(
-                           std::chrono::system_clock::now().time_since_epoch())
-                           .count();
+    auto currentTime = Utils::getCurrentTimeMS();
     httplib::Headers headers = {
         {"STATSIG-API-KEY", this->sdkKey},
         {"STATSIG-CLIENT-TIME", std::to_string(currentTime)},

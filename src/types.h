@@ -1,6 +1,5 @@
 #pragma once
 
-#include <any>
 #include <string>
 #include <unordered_map>
 #include <variant>
@@ -8,9 +7,30 @@
 
 #include <nlohmann/json.hpp>
 
+namespace JSON
+{
+  // json::any -- types that are supported by json conversion
+  // We cannot use generic std::any because we need to define how to convert each non-STL type
+  using any = std::variant<
+      int,
+      float,
+      double,
+      long,
+      long long,
+      std::string,
+      std::vector<bool>,
+      std::vector<int>,
+      std::vector<float>,
+      std::vector<double>,
+      std::vector<long>,
+      std::vector<long long>,
+      std::vector<std::string>,
+      struct statsig::StatsigMetadata>;
+}
+
 namespace statsig
 {
-  using number = std::variant<int, float, double>;
+  using number = std::variant<int, float, double, long, long long>;
 
   struct Options
   {
@@ -27,8 +47,8 @@ namespace statsig
     std::string country;
     std::string locale;
     std::string appVersion;
-    std::unordered_map<std::string, std::any> custom;
-    std::unordered_map<std::string, std::any> privateAttribute;
+    std::unordered_map<std::string, JSON::any> custom;
+    std::unordered_map<std::string, JSON::any> privateAttribute;
     std::unordered_map<std::string, std::string> statsigEnvironment;
     std::unordered_map<std::string, std::string> customIDs;
     User() : userID(""),
@@ -38,19 +58,19 @@ namespace statsig
              country(""),
              locale(""),
              appVersion(""),
-             custom(std::unordered_map<std::string, std::any>()),
-             privateAttribute(std::unordered_map<std::string, std::any>()),
+             custom(std::unordered_map<std::string, JSON::any>()),
+             privateAttribute(std::unordered_map<std::string, JSON::any>()),
              statsigEnvironment(std::unordered_map<std::string, std::string>()),
-             customIDs(std::unordered_map<std::string, std::string>()){}
+             customIDs(std::unordered_map<std::string, std::string>()) {}
   };
 
   struct DynamicConfig
   {
     std::string name;
-    std::unordered_map<std::string, std::any> value;
+    std::unordered_map<std::string, JSON::any> value;
     std::string ruleID;
     DynamicConfig() : name(""),
-                      value(std::unordered_map<std::string, std::any>()),
+                      value(std::unordered_map<std::string, JSON::any>()),
                       ruleID("") {}
   };
 
@@ -73,17 +93,11 @@ namespace statsig
     bool fetchFromServer;
     bool booleanValue;
     DynamicConfig configValue;
+    std::string ruleID;
     std::vector<std::unordered_map<std::string, std::string>> secondaryExposures;
     std::vector<std::unordered_map<std::string, std::string>> undelegatedSecondaryExposures;
-    std::unordered_map<std::string, bool> explicitParameters;
+    std::optional<std::vector<std::string>> explicitParameters;
     bool isExperimentGroup;
-    EvalResult() : fetchFromServer(false),
-                   booleanValue(false),
-                   configValue(DynamicConfig()),
-                   secondaryExposures(std::vector<std::unordered_map<std::string, std::string>>()),
-                   undelegatedSecondaryExposures(std::vector<std::unordered_map<std::string, std::string>>()),
-                   explicitParameters(std::unordered_map<std::string, bool>()),
-                   isExperimentGroup(false){};
   };
 
   struct ConfigCondition
@@ -91,14 +105,14 @@ namespace statsig
     std::string type;
     std::string idType;
     bool isDeviceBased;
-    std::optional<std::string> oper; // operator is a c++ keyword
+    std::optional<std::string> op; // operator is a c++ keyword
     std::optional<std::string> field;
-    std::optional<std::variant<std::vector<std::string>, std::vector<number>, std::string, number>> targetValue;
+    std::optional<JSON::any> targetValue;
     std::optional<std::unordered_map<std::string, std::string>> additionalValues;
     ConfigCondition() : type(""),
                         idType(""),
                         isDeviceBased(false),
-                        oper(std::nullopt),
+                        op(std::nullopt),
                         field(std::nullopt),
                         targetValue(std::nullopt),
                         additionalValues(std::nullopt){};
@@ -111,8 +125,7 @@ namespace statsig
     std::string salt;
     double passPercentage;
     std::vector<ConfigCondition> conditions;
-    // std::variant<bool, std::unordered_map<std::string, std::any>> returnValue;
-    std::variant<bool, nlohmann::json> returnValue;
+    std::variant<bool, std::unordered_map<std::string, JSON::any>> returnValue;
     std::string idType;
     std::optional<std::string> configDelegate;
     std::optional<bool> isExperimentGroup;
@@ -134,8 +147,7 @@ namespace statsig
     std::string salt;
     bool enabled;
     std::vector<ConfigRule> rules;
-    // std::variant<bool, std::unordered_map<std::string, std::any>> defaultValue;
-    std::variant<bool, nlohmann::json> defaultValue;
+    std::variant<bool, std::unordered_map<std::string, JSON::any>> defaultValue;
     std::string idType;
     std::optional<std::vector<std::string>> explicitParameters;
     std::optional<std::string> entity;

@@ -307,30 +307,6 @@ src/store.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Statsig.dir/build.make CMakeFiles/Statsig.dir/src/store.cpp.s
 .PHONY : src/store.cpp.s
 
-src/utils.o: src/utils.cpp.o
-.PHONY : src/utils.o
-
-# target to build an object file
-src/utils.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Statsig.dir/build.make CMakeFiles/Statsig.dir/src/utils.cpp.o
-.PHONY : src/utils.cpp.o
-
-src/utils.i: src/utils.cpp.i
-.PHONY : src/utils.i
-
-# target to preprocess a source file
-src/utils.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Statsig.dir/build.make CMakeFiles/Statsig.dir/src/utils.cpp.i
-.PHONY : src/utils.cpp.i
-
-src/utils.s: src/utils.cpp.s
-.PHONY : src/utils.s
-
-# target to generate assembly for a file
-src/utils.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Statsig.dir/build.make CMakeFiles/Statsig.dir/src/utils.cpp.s
-.PHONY : src/utils.cpp.s
-
 tests/test-initialize.o: tests/test-initialize.cpp.o
 .PHONY : tests/test-initialize.o
 
@@ -384,9 +360,6 @@ help:
 	@echo "... src/store.o"
 	@echo "... src/store.i"
 	@echo "... src/store.s"
-	@echo "... src/utils.o"
-	@echo "... src/utils.i"
-	@echo "... src/utils.s"
 	@echo "... tests/test-initialize.o"
 	@echo "... tests/test-initialize.i"
 	@echo "... tests/test-initialize.s"

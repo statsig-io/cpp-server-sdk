@@ -25,7 +25,7 @@ set(CMAKE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # Default system variables needed for dependencies
 # NOTE: These will likely need to be overriden when importing this library
-set(OPENSSL_ROOT_DIR /opt/homebrew/opt/openssl@3)
+set(OPENSSL_ROOT_DIR /opt/homebrew/opt/openssl)
 
 # Download 3rd party libraries.
 include(FetchContent)
@@ -37,7 +37,7 @@ target_link_libraries(Statsig PUBLIC nlohmann_json::nlohmann_json)
 
 # Find 3rd party packages via CMake Find Modules
 # These are usually included in CMake distribution and don't need to be installed
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED COMPONENTS regex)
 target_include_directories(Statsig PUBLIC ${Boost_INCLUDE_DIRS})
 target_link_libraries(Statsig PUBLIC ${Boost_LIBRARIES})
 find_package(OpenSSL REQUIRED)

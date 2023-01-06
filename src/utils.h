@@ -6,9 +6,12 @@
 #include <unordered_map>
 #include <variant>
 
+#include <boost/beast/core/detail/base64.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <openssl/sha.h>
+#include <openssl/evp.h>
 
 #include "json.h"
 
@@ -49,6 +52,26 @@ namespace statsig
       }
     };
 
+    template <typename T, typename... Ts>
+    static std::optional<T> typeSafeGet(std::optional<std::variant<Ts...>> value)
+    {
+      if (!value)
+      {
+        return std::nullopt;
+      }
+      return typeSafeGet<T>(value.value());
+    }
+
+    template <typename T, typename... Ts>
+    static std::optional<T> typeSafeGet(std::variant<Ts...> value)
+    {
+      if (const T *maybeValue = std::get_if<T>(&value))
+      {
+        return *maybeValue;
+      }
+      return std::nullopt;
+    }
+
     static std::string genUUIDString()
     {
       boost::uuids::uuid uuid = boost::uuids::random_generator()();
@@ -61,5 +84,58 @@ namespace statsig
       nlohmann::json jsonObj = map;
       return jsonObj.dump();
     };
+
+    template <typename T>
+    static std::string vectorToJsonString(std::vector<T> vector)
+    {
+      nlohmann::json jsonObj = vector;
+      return jsonObj.dump();
+    };
+
+    static long long getCurrentTimeMS()
+    {
+      return std::chrono::duration_cast<std::chrono::milliseconds>(
+                 std::chrono::system_clock::now().time_since_epoch())
+          .count();
+    }
+
+    static std::string sha256(const std::string &unhashed)
+    {
+      std::string hashed;
+      EVP_MD_CTX *context = EVP_MD_CTX_new();
+      if (context != NULL)
+      {
+        if (EVP_DigestInit_ex(context, EVP_sha256(), NULL))
+        {
+          if (EVP_DigestUpdate(context, unhashed.c_str(), unhashed.length()))
+          {
+            unsigned char hash[EVP_MAX_MD_SIZE];
+            unsigned int lengthOfHash = 0;
+
+            if (EVP_DigestFinal_ex(context, hash, &lengthOfHash))
+            {
+              std::stringstream ss;
+              for (unsigned int i = 0; i < lengthOfHash; ++i)
+              {
+                ss << std::hex << std::setw(2) << std::setfill('0') << (int)hash[i];
+              }
+
+              hashed = ss.str();
+            }
+          }
+        }
+
+        EVP_MD_CTX_free(context);
+      }
+      return hashed;
+    }
+
+    static long long base64Encode(const std::string str)
+    {
+      size_t size = 16;
+      void* encoded = malloc(boost::beast::detail::base64::encoded_size(size));
+      boost::beast::detail::base64::encode(encoded, &str, size);
+      return (long long)encoded;
+    }
   };
 }
