@@ -28,12 +28,12 @@ namespace statsig
   EvalResult Evaluator::evaluate(User user, ConfigSpec spec)
   {
     std::vector<std::unordered_map<std::string, std::string>> exposures;
-    DynamicConfig defaultValue = DynamicConfig();
+    std::unordered_map<std::string, JSON::any> defaultValue;
     std::optional<std::unordered_map<std::string, JSON::any>> defaultJson = Utils::typeSafeGet<std::unordered_map<std::string, JSON::any>>(spec.defaultValue);
     if (defaultJson)
     {
       nlohmann::json j = defaultJson.value();
-      j.get_to(defaultValue);
+      json_safe_deserialize(j, defaultValue);
     }
     if (!spec.enabled)
     {
@@ -59,7 +59,7 @@ namespace statsig
           return delegatedResult.value();
         }
         bool pass = evalPassPercentage(user, rule, spec);
-        DynamicConfig configValue = pass ? result.configValue : defaultValue;
+        std::unordered_map<std::string, JSON::any> configValue = pass ? result.configValue : defaultValue;
         return EvalResult{
             false, pass, configValue, result.ruleID, exposures, exposures, spec.explicitParameters,
             false};
@@ -90,12 +90,12 @@ namespace statsig
         pass = false;
       }
     }
-    DynamicConfig returnValue = DynamicConfig();
+    std::unordered_map<std::string, JSON::any> returnValue;
     std::optional<std::unordered_map<std::string, JSON::any>> defaultJson = Utils::typeSafeGet<std::unordered_map<std::string, JSON::any>>(rule.returnValue);
     if (defaultJson)
     {
       nlohmann::json j = defaultJson.value();
-      j.get_to(returnValue);
+      json_safe_deserialize(j, returnValue);
     }
     return EvalResult{false, pass, returnValue, rule.id,
                       exposures, exposures, std::nullopt, rule.isExperimentGroup.value_or(false)};
@@ -131,7 +131,7 @@ namespace statsig
                          gateResult.secondaryExposures.end());
       }
       bool pass = type == "PASS_GATE" ? gateResult.booleanValue : !gateResult.booleanValue;
-      return EvalResult{gateResult.fetchFromServer, pass, DynamicConfig(), "", exposures, exposures};
+      return EvalResult{gateResult.fetchFromServer, pass, std::unordered_map<std::string, JSON::any>(), "", exposures, exposures};
     }
     else if (type == "IP_BASED")
     {

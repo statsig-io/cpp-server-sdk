@@ -7,6 +7,8 @@
 
 #include <nlohmann/json.hpp>
 
+#include "statsig_metadata.h"
+
 namespace JSON
 {
   // json::any -- types that are supported by json conversion
@@ -69,9 +71,15 @@ namespace statsig
     std::string name;
     std::unordered_map<std::string, JSON::any> value;
     std::string ruleID;
-    DynamicConfig() : name(""),
-                      value(std::unordered_map<std::string, JSON::any>()),
-                      ruleID("") {}
+    // DynamicConfig() : name(""),
+    //                   value(std::unordered_map<std::string, JSON::any>()),
+    //                   ruleID(""){};
+    // DynamicConfig(
+    //     std::string name,
+    //     std::unordered_map<std::string, JSON::any> value,
+    //     std::string ruleID) : name(name),
+    //                           value(value),
+    //                           ruleID(ruleID){};
   };
 
   struct Event
@@ -81,18 +89,13 @@ namespace statsig
     std::string value;
     std::unordered_map<std::string, std::string> metadata;
     int time;
-    Event() : eventName(""),
-              user(User()),
-              value(""),
-              metadata(std::unordered_map<std::string, std::string>()),
-              time(0){};
   };
 
   struct EvalResult
   {
     bool fetchFromServer;
     bool booleanValue;
-    DynamicConfig configValue;
+    std::unordered_map<std::string, JSON::any> configValue;
     std::string ruleID;
     std::vector<std::unordered_map<std::string, std::string>> secondaryExposures;
     std::vector<std::unordered_map<std::string, std::string>> undelegatedSecondaryExposures;
@@ -109,13 +112,6 @@ namespace statsig
     std::optional<std::string> field;
     std::optional<JSON::any> targetValue;
     std::optional<std::unordered_map<std::string, std::string>> additionalValues;
-    ConfigCondition() : type(""),
-                        idType(""),
-                        isDeviceBased(false),
-                        op(std::nullopt),
-                        field(std::nullopt),
-                        targetValue(std::nullopt),
-                        additionalValues(std::nullopt){};
   };
 
   struct ConfigRule
@@ -129,15 +125,6 @@ namespace statsig
     std::string idType;
     std::optional<std::string> configDelegate;
     std::optional<bool> isExperimentGroup;
-    ConfigRule() : name(""),
-                   id(""),
-                   salt(""),
-                   passPercentage(0.0),
-                   conditions(std::vector<ConfigCondition>()),
-                   returnValue(false),
-                   idType(""),
-                   configDelegate(std::nullopt),
-                   isExperimentGroup(std::nullopt){};
   };
 
   struct ConfigSpec
@@ -153,16 +140,5 @@ namespace statsig
     std::optional<std::string> entity;
     std::optional<bool> isActive;
     std::optional<bool> hasSharedParams;
-    ConfigSpec() : name(""),
-                   type(""),
-                   salt(""),
-                   enabled(false),
-                   rules(std::vector<ConfigRule>()),
-                   defaultValue(false),
-                   idType(""),
-                   explicitParameters(std::nullopt),
-                   entity(std::nullopt),
-                   isActive(std::nullopt),
-                   hasSharedParams(std::nullopt){};
   };
 }

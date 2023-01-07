@@ -63,10 +63,10 @@ namespace statsig
         return;
       }
 
-      specsJSON.at("feature_gates").get_to(this->featureGates);
-      specsJSON.at("dynamic_configs").get_to(this->dynamicConfigs);
-      specsJSON.at("layer_configs").get_to(this->layerConfigs);
-      specsJSON.at("layers").get_to(this->experimentToLayer); // TODO: reverse mapping
+      json_safe_deserialize(specsJSON.at("feature_gates"), this->featureGates);
+      json_safe_deserialize(specsJSON.at("dynamic_configs"), this->dynamicConfigs);
+      json_safe_deserialize(specsJSON.at("layer_configs"), this->layerConfigs);
+      json_safe_deserialize(specsJSON.at("layers"), this->experimentToLayer); // TODO: reverse mapping
     }
     catch (...)
     {

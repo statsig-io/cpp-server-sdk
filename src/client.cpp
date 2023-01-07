@@ -11,7 +11,7 @@ namespace statsig
   DynamicConfig Client::getConfig(User user, std::string config)
   {
     auto res = this->evaluator->getConfig(user, config);
-    return res.configValue;
+    return DynamicConfig{config, res.configValue, res.ruleID};
   }
 
   void Client::shutdown()

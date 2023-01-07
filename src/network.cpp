@@ -8,7 +8,7 @@ namespace statsig
 
   httplib::Result Network::postRequest(std::string endpoint, std::multimap<std::string, JSON::any> body)
   {
-    return Network::postRequest(endpoint, Utils::mapToJsonString<std::string, JSON::any>(body));
+    return Network::postRequest(endpoint, Utils::toJsonString(body));
   }
 
   httplib::Result Network::postRequest(std::string endpoint, std::string body)

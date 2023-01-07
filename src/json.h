@@ -13,9 +13,13 @@ namespace nlohmann
   inline void to_json(nlohmann::json &j, const std::optional<T> &v)
   {
     if (v.has_value())
+    {
       j = *v;
+    }
     else
+    {
       j = nullptr;
+    }
   }
 
   inline void to_json(nlohmann::json &j, const JSON::any &v)
@@ -115,12 +119,40 @@ namespace nlohmann
     };
   }
 
+  inline void to_json(nlohmann::json &j, const statsig::User &v)
+  {
+    j = json{
+        {"userID", v.userID},
+        {"email", v.email},
+        {"ipAddress", v.ipAddress},
+        {"userAgent", v.userAgent},
+        {"country", v.country},
+        {"locale", v.locale},
+        {"appVersion", v.appVersion},
+        {"custom", v.custom},
+        {"privateAttribute", v.privateAttribute},
+        {"statsigEnvironment", v.statsigEnvironment},
+        {"customIDs", v.customIDs},
+    };
+  }
+
   inline void to_json(nlohmann::json &j, const statsig::DynamicConfig &v)
   {
     j = json{
         {"name", v.name},
         {"value", v.value},
         {"ruleID", v.ruleID},
+    };
+  }
+
+  inline void to_json(nlohmann::json &j, const statsig::Event &v)
+  {
+    j = json{
+        {"eventName", v.eventName},
+        {"user", v.user},
+        {"value", v.value},
+        {"metadata", v.metadata},
+        {"time", v.time},
     };
   }
 
@@ -186,15 +218,27 @@ namespace nlohmann
   // --------------------
   // JSON deserialization
   // --------------------
+
+  /**
+   * Deserialize a given field from json object
+   * Will throw if given key does not exist (unless marked as 'optional')
+   * NOTE:
+   *  The reason we allow it to throw is because for cases where we deserialize variants
+   *  we need a way to determine if the json object "fits" the attempted type.
+   */
   template <typename T>
-  inline void json_safe_deserialize(const nlohmann::json j, std::string key, T &v, bool isOptional = false)
+  inline void key_safe_deserialize(const nlohmann::json j, std::string key, T &v, bool optional = false)
   {
-    if (!isOptional || j.contains(key))
+    if (!optional || j.contains(key))
     {
       j.at(key).get_to(v);
     }
   }
 
+  /**
+   * Deserialize a json object into a specified type within a variant
+   * Will fail to deserialize if the json object does not "fit" the specified type
+   */
   template <typename T, typename... Ts>
   inline void type_safe_deserialize(const nlohmann::json j, std::variant<Ts...> &v)
   {
@@ -203,6 +247,22 @@ namespace nlohmann
       v = j.get<T>();
     }
     catch (nlohmann::json::type_error &e)
+    {
+    }
+  }
+
+  /**
+   * Deserializes a json object into a specified type without throwing
+   * Equivalent to j.get_to(v);
+   */
+  template <typename T>
+  inline void json_safe_deserialize(const nlohmann::json j, T &v)
+  {
+    try
+    {
+      j.get_to(v);
+    }
+    catch (...)
     {
     }
   }
@@ -260,54 +320,54 @@ namespace nlohmann
 
   inline void from_json(const nlohmann::json &j, struct statsig::StatsigMetadata &v)
   {
-    json_safe_deserialize(j, "sdkType", v.sdkType);
-    json_safe_deserialize(j, "sdkVersion", v.sdkVersion);
+    key_safe_deserialize(j, "sdkType", v.sdkType);
+    key_safe_deserialize(j, "sdkVersion", v.sdkVersion);
   }
 
   inline void from_json(const nlohmann::json &j, statsig::DynamicConfig &v)
   {
-    json_safe_deserialize(j, "name", v.name);
-    json_safe_deserialize(j, "value", v.value);
-    json_safe_deserialize(j, "ruleID", v.ruleID);
+    key_safe_deserialize(j, "name", v.name);
+    key_safe_deserialize(j, "value", v.value);
+    key_safe_deserialize(j, "ruleID", v.ruleID);
   }
 
   inline void from_json(const nlohmann::json &j, statsig::ConfigCondition &v)
   {
-    json_safe_deserialize(j, "type", v.type);
-    json_safe_deserialize(j, "operator", v.op, true);
-    json_safe_deserialize(j, "field", v.field, true);
-    json_safe_deserialize(j, "targetValue", v.targetValue, true);
-    json_safe_deserialize(j, "additionalValues", v.additionalValues, true);
-    json_safe_deserialize(j, "idType", v.idType);
-    json_safe_deserialize(j, "isDeviceBased", v.isDeviceBased);
+    key_safe_deserialize(j, "type", v.type);
+    key_safe_deserialize(j, "operator", v.op, true);
+    key_safe_deserialize(j, "field", v.field, true);
+    key_safe_deserialize(j, "targetValue", v.targetValue, true);
+    key_safe_deserialize(j, "additionalValues", v.additionalValues, true);
+    key_safe_deserialize(j, "idType", v.idType);
+    key_safe_deserialize(j, "isDeviceBased", v.isDeviceBased);
   }
 
   inline void from_json(const nlohmann::json &j, statsig::ConfigRule &v)
   {
-    json_safe_deserialize(j, "name", v.name);
-    json_safe_deserialize(j, "id", v.id);
-    json_safe_deserialize(j, "salt", v.salt);
-    json_safe_deserialize(j, "passPercentage", v.passPercentage);
-    json_safe_deserialize(j, "conditions", v.conditions);
-    json_safe_deserialize(j, "returnValue", v.returnValue);
-    json_safe_deserialize(j, "idType", v.idType);
-    json_safe_deserialize(j, "configDelegate", v.configDelegate, true);
-    json_safe_deserialize(j, "isExperimentGroup", v.isExperimentGroup, true);
+    key_safe_deserialize(j, "name", v.name);
+    key_safe_deserialize(j, "id", v.id);
+    key_safe_deserialize(j, "salt", v.salt);
+    key_safe_deserialize(j, "passPercentage", v.passPercentage);
+    key_safe_deserialize(j, "conditions", v.conditions);
+    key_safe_deserialize(j, "returnValue", v.returnValue);
+    key_safe_deserialize(j, "idType", v.idType);
+    key_safe_deserialize(j, "configDelegate", v.configDelegate, true);
+    key_safe_deserialize(j, "isExperimentGroup", v.isExperimentGroup, true);
   }
 
   inline void from_json(const nlohmann::json &j, statsig::ConfigSpec &v)
   {
-    json_safe_deserialize(j, "name", v.name);
-    json_safe_deserialize(j, "type", v.type);
-    json_safe_deserialize(j, "salt", v.salt);
-    json_safe_deserialize(j, "enabled", v.enabled);
-    json_safe_deserialize(j, "rules", v.rules);
-    json_safe_deserialize(j, "defaultValue", v.defaultValue);
-    json_safe_deserialize(j, "idType", v.idType);
-    json_safe_deserialize(j, "explicitParameters", v.explicitParameters, true);
-    json_safe_deserialize(j, "entity", v.entity, true);
-    json_safe_deserialize(j, "isActive", v.isActive, true);
-    json_safe_deserialize(j, "hasSharedParams", v.hasSharedParams, true);
+    key_safe_deserialize(j, "name", v.name);
+    key_safe_deserialize(j, "type", v.type);
+    key_safe_deserialize(j, "salt", v.salt);
+    key_safe_deserialize(j, "enabled", v.enabled);
+    key_safe_deserialize(j, "rules", v.rules);
+    key_safe_deserialize(j, "defaultValue", v.defaultValue);
+    key_safe_deserialize(j, "idType", v.idType);
+    key_safe_deserialize(j, "explicitParameters", v.explicitParameters, true);
+    key_safe_deserialize(j, "entity", v.entity, true);
+    key_safe_deserialize(j, "isActive", v.isActive, true);
+    key_safe_deserialize(j, "hasSharedParams", v.hasSharedParams, true);
   }
 
   // Special case where the input json is actually a list of ConfigSpec objects
@@ -325,5 +385,102 @@ namespace nlohmann
     catch (...)
     {
     }
+  }
+}
+
+namespace statsig
+{
+  // ---------------------
+  // JSON stringify object
+  // ---------------------
+  inline std::ostream &operator<<(std::ostream &os, const struct statsig::StatsigMetadata &object)
+  {
+    nlohmann::json j = object;
+    return os << j.dump();
+  }
+  inline std::ostream &operator<<(std::ostream &os, const statsig::User &object)
+  {
+    nlohmann::json j = object;
+    return os << j.dump();
+  }
+  inline std::ostream &operator<<(std::ostream &os, const statsig::DynamicConfig &object)
+  {
+    nlohmann::json j = object;
+    return os << j.dump();
+  }
+  inline std::ostream &operator<<(std::ostream &os, const statsig::Event &object)
+  {
+    nlohmann::json j = object;
+    return os << j.dump();
+  }
+  inline std::ostream &operator<<(std::ostream &os, const statsig::EvalResult &object)
+  {
+    nlohmann::json j = object;
+    return os << j.dump();
+  }
+  inline std::ostream &operator<<(std::ostream &os, const statsig::ConfigCondition &object)
+  {
+    nlohmann::json j = object;
+    return os << j.dump();
+  }
+  inline std::ostream &operator<<(std::ostream &os, const statsig::ConfigRule &object)
+  {
+    nlohmann::json j = object;
+    return os << j.dump();
+  }
+  inline std::ostream &operator<<(std::ostream &os, const statsig::ConfigSpec &object)
+  {
+    nlohmann::json j = object;
+    return os << j.dump();
+  }
+  template <typename K, typename V>
+  inline std::ostream &operator<<(std::ostream &os, const std::unordered_map<K, V> &map)
+  {
+    os << "{";
+    bool first = true;
+    for (auto const& e : map)
+    {
+      if (!first) {
+        os << ", ";
+      }
+      os << "\"" << e.first << "\": " << e.second;
+      first = first ? !first : first;
+    }
+    return os << "}";
+  }
+  template <typename T>
+  inline std::ostream &operator<<(std::ostream &os, const std::optional<T> &object)
+  {
+    if (object.has_value())
+    {
+      return os << object;
+    }
+    else
+    {
+      if (std::is_same<T, std::string>::value)
+      {
+        return os << "\"\"";
+      }
+      else if (std::is_same<T, int>::value || std::is_same<T, long>::value || std::is_same<T, long long>::value)
+      {
+        return os << "0";
+      }
+      else if (std::is_same<T, float>::value || std::is_same<T, double>::value)
+      {
+        return os << "0.0";
+      }
+      else if (std::is_same<T, bool>::value)
+      {
+        return os << "false";
+      }
+      else
+      {
+        return os << "{}";
+      }
+    }
+  }
+  inline std::ostream &operator<<(std::ostream &os, const std::string &object)
+  {
+    return os << std::boolalpha << "\"" << object << "\"";
   }
 }

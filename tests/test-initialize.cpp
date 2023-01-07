@@ -14,5 +14,11 @@ int main(int argc, char **argv) {
   std::cout << std::boolalpha;
   std::cout << "expect false: " << fail << std::endl;
   std::cout << "expect true: " << pass << std::endl;
+
+  statsig::DynamicConfig testConfig = statsig.getConfig(user, "test_config");
+  statsig::DynamicConfig testConfig2 = statsig.getConfig(user, "test_config_2");
+
+  std::cout << "test_config: " << testConfig << std::endl;
+  std::cout << "test_config_2: " << testConfig2 << std::endl;
   statsig.shutdown();
 }

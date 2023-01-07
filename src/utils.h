@@ -78,19 +78,12 @@ namespace statsig
       return boost::uuids::to_string(uuid);
     };
 
-    template <typename K, typename V>
-    static std::string mapToJsonString(Map<K, V> map)
-    {
-      nlohmann::json jsonObj = map;
-      return jsonObj.dump();
-    };
-
     template <typename T>
-    static std::string vectorToJsonString(std::vector<T> vector)
+    static std::string toJsonString(T object)
     {
-      nlohmann::json jsonObj = vector;
-      return jsonObj.dump();
-    };
+      nlohmann::json j = object;
+      return j.dump();
+    }
 
     static long long getCurrentTimeMS()
     {
@@ -133,7 +126,7 @@ namespace statsig
     static long long base64Encode(const std::string str)
     {
       size_t size = 16;
-      void* encoded = malloc(boost::beast::detail::base64::encoded_size(size));
+      void *encoded = malloc(boost::beast::detail::base64::encoded_size(size));
       boost::beast::detail::base64::encode(encoded, &str, size);
       return (long long)encoded;
     }
