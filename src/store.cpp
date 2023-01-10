@@ -2,14 +2,9 @@
 
 namespace statsig
 {
-  void Store::initialize()
-  {
-    Store::fetchConfigSpecs();
-  }
+  void Store::initialize() { Store::fetchConfigSpecs(); }
 
-  void Store::shutdown()
-  {
-  }
+  void Store::shutdown() {}
 
   std::optional<ConfigSpec> Store::getGate(std::string gateName)
   {
@@ -66,11 +61,26 @@ namespace statsig
       json_safe_deserialize(specsJSON.at("feature_gates"), this->featureGates);
       json_safe_deserialize(specsJSON.at("dynamic_configs"), this->dynamicConfigs);
       json_safe_deserialize(specsJSON.at("layer_configs"), this->layerConfigs);
-      json_safe_deserialize(specsJSON.at("layers"), this->experimentToLayer); // TODO: reverse mapping
+      std::unordered_map<std::string, std::vector<std::string>> layerToExperiments;
+      json_safe_deserialize(specsJSON.at("layers"), layerToExperiments);
+      this->experimentToLayer = reverseLayerToExperimentsMapping(layerToExperiments);
     }
     catch (...)
     {
       // TODO: Log SDK exception
     }
+  }
+
+  std::unordered_map<std::string, std::string> Store::reverseLayerToExperimentsMapping(
+      std::unordered_map<std::string, std::vector<std::string>> &map)
+  {
+    std::unordered_map<std::string, std::string> experimentToLayer;
+    for (auto &[layerName, experiments] : map)
+    {
+      for (auto experimentName : experiments) {
+        experimentToLayer.insert({experimentName, layerName});
+      }
+    }
+    return experimentToLayer;
   }
 }

@@ -37,5 +37,7 @@ namespace statsig
     std::unordered_map<std::string, std::string> experimentToLayer;
     void fetchConfigSpecs();
     void processSpecsJSON(nlohmann::json specsJSON);
+    std::unordered_map<std::string, std::string>
+    reverseLayerToExperimentsMapping(std::unordered_map<std::string, std::vector<std::string>> &map);
   };
 }
