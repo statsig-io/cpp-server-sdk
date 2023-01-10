@@ -184,8 +184,8 @@ namespace statsig
     std::optional<std::string> targetAsString = Utils::typeSafeGet<std::string>(target);
     std::optional<std::vector<std::string>> targetAsVector =
         Utils::typeSafeGet<std::vector<std::string>>(target);
-    std::optional<std::vector<std::string>> valueAsDate =
-        Utils::typeSafeGet<std::vector<std::string>>(target);
+    auto valueAsTime = EvaluatorUtils::getPosixTime(value.value_or(0));
+    auto targetAsTime = EvaluatorUtils::getPosixTime(target.value_or(0));
 
     std::string op = condition.op.value_or("");
     if (op == "gt" || op == "gte" || op == "lt" || op == "lte")
@@ -314,15 +314,15 @@ namespace statsig
     }
     else if (op == "before")
     {
-      return EvalResult{false, EvaluatorUtils::compareDates()};
+      return EvalResult{false, valueAsTime < targetAsTime};
     }
     else if (op == "after")
     {
-      return EvalResult{false, EvaluatorUtils::compareDates()};
+      return EvalResult{false, valueAsTime > targetAsTime};
     }
     else if (op == "on")
     {
-      return EvalResult{false, EvaluatorUtils::compareDates()};
+      return EvalResult{false, valueAsTime.date() == targetAsTime.date()};
     }
     // TODO: support id lists
 

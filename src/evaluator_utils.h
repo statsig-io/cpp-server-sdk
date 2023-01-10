@@ -3,6 +3,9 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 
+#include "utils.h"
+#include "boost/date_time/posix_time/posix_time.hpp"
+
 namespace statsig
 {
   class EvaluatorUtils
@@ -79,10 +82,48 @@ namespace statsig
       return compare(a, b, op.substr(op.find("version_") + 1), compareFn);
     }
 
-    static bool compareDates()
+    using Time = boost::posix_time::ptime;
+    static Time getPosixTime(JSON::any v)
     {
-      // TODO: compare dates
-      return false;
+      int time_maybe_ms;
+      if (const int *maybeInt = std::get_if<int>(&v))
+      {
+        time_maybe_ms = *maybeInt;
+      }
+      else if (const long *maybeLong = std::get_if<long>(&v))
+      {
+        time_maybe_ms = *maybeLong;
+      }
+      else if (const long long *maybeLongLong = std::get_if<long long>(&v))
+      {
+        time_maybe_ms = *maybeLongLong;
+      }
+      else if (const float *maybeFloat = std::get_if<float>(&v))
+      {
+        time_maybe_ms = int(*maybeFloat);
+      }
+      else if (const double *maybeDouble = std::get_if<double>(&v))
+      {
+        time_maybe_ms = int(*maybeDouble);
+      }
+      else if (const std::string *maybeString = std::get_if<std::string>(&v))
+      {
+        time_maybe_ms = stoi(*maybeString);
+      }
+
+      boost::posix_time::ptime epoch(boost::gregorian::date(1970, 1, 1));
+      if (std::to_string(time_maybe_ms).size() <= 11) // seconds
+      {
+        return epoch + boost::posix_time::milliseconds(time_maybe_ms * 1000);
+      }
+      else if (std::to_string(time_maybe_ms).size() <= 13) // miliseconds
+      {
+        return epoch + boost::posix_time::milliseconds(time_maybe_ms);
+      }
+      else // microseconds
+      { 
+        return epoch + boost::posix_time::milliseconds(time_maybe_ms / 1000);
+      }
     }
 
     template <typename T>
