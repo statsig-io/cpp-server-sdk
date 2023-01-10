@@ -1,7 +1,5 @@
 #pragma once
 
-#include <boost/algorithm/string.hpp>
-
 #include "evaluator_utils.h"
 #include "network.h"
 #include "store.h"

@@ -4,3 +4,5 @@ CMakeCache.txt
 *.a
 cmake_install.cmake
 CMakeFiles
+build
+tmp

@@ -71,15 +71,6 @@ namespace statsig
     std::string name;
     std::unordered_map<std::string, JSON::any> value;
     std::string ruleID;
-    // DynamicConfig() : name(""),
-    //                   value(std::unordered_map<std::string, JSON::any>()),
-    //                   ruleID(""){};
-    // DynamicConfig(
-    //     std::string name,
-    //     std::unordered_map<std::string, JSON::any> value,
-    //     std::string ruleID) : name(name),
-    //                           value(value),
-    //                           ruleID(ruleID){};
   };
 
   struct Event
@@ -133,6 +124,7 @@ namespace statsig
     std::string type;
     std::string salt;
     bool enabled;
+    bool isDeviceBased;
     std::vector<ConfigRule> rules;
     std::variant<bool, std::unordered_map<std::string, JSON::any>> defaultValue;
     std::string idType;

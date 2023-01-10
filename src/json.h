@@ -246,7 +246,7 @@ namespace nlohmann
     {
       v = j.get<T>();
     }
-    catch (nlohmann::json::type_error &e)
+    catch (...)
     {
     }
   }
@@ -447,6 +447,21 @@ namespace statsig
       first = first ? !first : first;
     }
     return os << "}";
+  }
+  template <typename T>
+  inline std::ostream &operator<<(std::ostream &os, const std::vector<T> &vec)
+  {
+    os << "[";
+    bool first = true;
+    for (auto const& e : vec)
+    {
+      if (!first) {
+        os << ", ";
+      }
+      os << e;
+      first = first ? !first : first;
+    }
+    return os << "]";
   }
   template <typename T>
   inline std::ostream &operator<<(std::ostream &os, const std::optional<T> &object)
