@@ -21,7 +21,6 @@ TEST_F(EvaluatorFixture, DefaultOptions)
   EXPECT_FALSE(failGate);
 
   statsig::DynamicConfig testConfig = statsig.getConfig(user, "test_custom_config");
-  std::cout << "testConfig: " << testConfig << std::endl;
   EXPECT_EQ(testConfig.name, "test_custom_config");
   EXPECT_EQ(testConfig.ruleID, "default");
   std::unordered_map<std::string, JSON::any> expectedValue = {

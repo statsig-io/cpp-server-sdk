@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.11)
 
+option(BUILD_TESTS "Compile with unit tests" OFF)
+
 project(Statsig
   VERSION "0.0.0"
   DESCRIPTION "Statsig C++ Server SDK"
@@ -55,4 +57,6 @@ add_library(Statsig::cpp ALIAS Statsig)
 target_compile_features(Statsig PUBLIC cxx_std_17)
 
 # Build the unit test binary, and add all of the unit tests.
-add_subdirectory(tests)
+if(BUILD_TESTS)
+  add_subdirectory(tests)
+endif()
