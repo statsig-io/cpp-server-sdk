@@ -28,7 +28,7 @@ namespace statsig
 
   void Store::fetchConfigSpecs()
   {
-    std::multimap<std::string, JSON::any> body = {
+    std::multimap<std::string, JSON::serializable> body = {
         {"statsigMetadata", StatsigMetadata},
         {"sinceTime", 0},
     };
@@ -45,7 +45,7 @@ namespace statsig
     catch (nlohmann::json::parse_error &e)
     {
       // TODO: Log SDK exception
-      std::cout << e.what() << std::endl;
+      std::cout << "Error parsing download_config_specs body: " << e.what() << std::endl;
     }
   }
 
@@ -77,7 +77,8 @@ namespace statsig
     std::unordered_map<std::string, std::string> experimentToLayer;
     for (auto &[layerName, experiments] : map)
     {
-      for (auto experimentName : experiments) {
+      for (auto experimentName : experiments)
+      {
         experimentToLayer.insert({experimentName, layerName});
       }
     }

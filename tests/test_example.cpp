@@ -4,14 +4,14 @@
 
 #include "utils/commonfixture.h"
 
-class EvaluatorFixture : public CommonFixture
+class ExampleFixture : public CommonFixture
 {
 };
 
-TEST_F(EvaluatorFixture, DefaultOptions)
+TEST_F(ExampleFixture, BasicAPI)
 {
   statsig::User user;
-  user.userID = "test user";
+  user.userID = "test user (c++ sdk)";
   user.email = "testuser@notstatsig.com";
 
   bool passGate = statsig.checkGate(user, "test_public");
@@ -28,6 +28,4 @@ TEST_F(EvaluatorFixture, DefaultOptions)
       {"foo", "bar"},
   };
   EXPECT_EQ(testConfig.value, expectedValue);
-
-  statsig.shutdown();
 }

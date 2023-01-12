@@ -1,6 +1,7 @@
 #pragma once
 
 #include "evaluator.h"
+#include "event_logger.h"
 #include "types.h"
 #include "network.h"
 
@@ -15,6 +16,7 @@ namespace statsig
       this->options = options;
       this->network = new Network(sdkKey, options);
       this->evaluator = new Evaluator(network, options);
+      this->logger = new EventLogger(network, options);
     }
     bool checkGate(User user, std::string gate);
     DynamicConfig getConfig(User user, std::string config);
@@ -25,5 +27,6 @@ namespace statsig
     Options options;
     Network *network;
     Evaluator *evaluator;
+    EventLogger *logger;
   };
 }

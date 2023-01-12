@@ -28,7 +28,7 @@ target_link_libraries(Statsig PUBLIC nlohmann_json::nlohmann_json)
 
 # Find 3rd party packages via CMake Find Modules
 # These are usually included in CMake distribution and don't need to be installed
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED COMPONENTS regex chrono thread)
 target_include_directories(Statsig PUBLIC ${Boost_INCLUDE_DIRS})
 target_link_libraries(Statsig PUBLIC ${Boost_LIBRARIES})
 find_package(OpenSSL REQUIRED)

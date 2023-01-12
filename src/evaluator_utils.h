@@ -108,7 +108,13 @@ namespace statsig
       }
       else if (const std::string *maybeString = std::get_if<std::string>(&v))
       {
-        time_maybe_ms = stoi(*maybeString);
+        try
+        {
+          time_maybe_ms = stoi(*maybeString);
+        }
+        catch (...)
+        {
+        }
       }
 
       boost::posix_time::ptime epoch(boost::gregorian::date(1970, 1, 1));
@@ -121,7 +127,7 @@ namespace statsig
         return epoch + boost::posix_time::milliseconds(time_maybe_ms);
       }
       else // microseconds
-      { 
+      {
         return epoch + boost::posix_time::milliseconds(time_maybe_ms / 1000);
       }
     }

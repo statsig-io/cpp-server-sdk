@@ -16,4 +16,6 @@ target_link_libraries(google_tests Statsig::cpp)
 target_link_libraries(google_tests GTest::gtest_main)
 target_compile_features(google_tests PUBLIC cxx_std_17)
 
+add_definitions( -DTESTS_ROOT_DIR="${CMAKE_CURRENT_SOURCE_DIR}" )
+
 gtest_discover_tests(google_tests)

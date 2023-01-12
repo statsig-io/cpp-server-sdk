@@ -333,7 +333,22 @@ namespace statsig
       User user, ConfigRule rule,
       std::vector<std::unordered_map<std::string, std::string>> exposures)
   {
-    return std::nullopt;
+    if (!rule.configDelegate)
+    {
+      return std::nullopt;
+    }
+    std::string configDelegate = rule.configDelegate.value();
+    auto maybeConfig = this->store->getConfig(configDelegate);
+    if (!maybeConfig)
+    {
+      return std::nullopt;
+    }
+    auto config = maybeConfig.value();
+    auto delegatedResult = evaluate(user, config);
+    delegatedResult.explicitParameters = config.explicitParameters.value_or(std::vector<std::string>());
+    delegatedResult.configDelegate = configDelegate;
+    delegatedResult.secondaryExposures.insert(delegatedResult.secondaryExposures.begin(), exposures.begin(), exposures.end());
+    return delegatedResult;
   }
 
   bool Evaluator::evalPassPercentage(User user, ConfigRule rule, ConfigSpec spec)

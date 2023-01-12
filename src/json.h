@@ -3,6 +3,7 @@
 #include <nlohmann/json.hpp>
 
 #include "types.h"
+#include <iostream>
 
 namespace nlohmann
 {
@@ -19,6 +20,76 @@ namespace nlohmann
     else
     {
       j = nullptr;
+    }
+  }
+
+  // No easy way to support a generic variant template.
+  // Manually specify every possible variant here:
+  inline void to_json(nlohmann::json &j, const JSON::serializable &v)
+  {
+    if (const int *maybeInt = std::get_if<int>(&v))
+    {
+      j = *maybeInt;
+    }
+    else if (const float *maybeFloat = std::get_if<float>(&v))
+    {
+      j = *maybeFloat;
+    }
+    else if (const double *maybeDouble = std::get_if<double>(&v))
+    {
+      j = *maybeDouble;
+    }
+    else if (const long *maybeLong = std::get_if<long>(&v))
+    {
+      j = *maybeLong;
+    }
+    else if (const long long *maybeLongLong = std::get_if<long long>(&v))
+    {
+      j = *maybeLongLong;
+    }
+    else if (const std::string *maybeString = std::get_if<std::string>(&v))
+    {
+      j = *maybeString;
+    }
+    else if (const statsig::Event *maybeEvent = std::get_if<statsig::Event>(&v))
+    {
+      j = *maybeEvent;
+    }
+    else if (const std::vector<bool> *maybeBoolVec = std::get_if<std::vector<bool>>(&v))
+    {
+      j = *maybeBoolVec;
+    }
+    else if (const std::vector<int> *maybeIntVec = std::get_if<std::vector<int>>(&v))
+    {
+      j = *maybeIntVec;
+    }
+    else if (const std::vector<float> *maybeFloatVec = std::get_if<std::vector<float>>(&v))
+    {
+      j = *maybeFloatVec;
+    }
+    else if (const std::vector<double> *maybeDoubleVec = std::get_if<std::vector<double>>(&v))
+    {
+      j = *maybeDoubleVec;
+    }
+    else if (const std::vector<long> *maybeLongVec = std::get_if<std::vector<long>>(&v))
+    {
+      j = *maybeLongVec;
+    }
+    else if (const std::vector<long long> *maybeLongLongVec = std::get_if<std::vector<long long>>(&v))
+    {
+      j = *maybeLongLongVec;
+    }
+    else if (const std::vector<std::string> *maybeStringVec = std::get_if<std::vector<std::string>>(&v))
+    {
+      j = *maybeStringVec;
+    }
+    else if (const std::vector<statsig::Event> *maybeEventVec = std::get_if<std::vector<statsig::Event>>(&v))
+    {
+      j = *maybeEventVec;
+    }
+    else if (const struct statsig::StatsigMetadata *maybeStatsigMetadata = std::get_if<struct statsig::StatsigMetadata>(&v))
+    {
+      j = *maybeStatsigMetadata;
     }
   }
 
@@ -215,6 +286,16 @@ namespace nlohmann
     };
   }
 
+  inline void to_json(nlohmann::json &j, const statsig::Options &v)
+  {
+    j = json{
+        {"api", v.api},
+        {"localMode", v.localMode},
+        {"loggingIntervalMs", v.loggingIntervalMs},
+        {"loggingMaxBufferSize", v.loggingMaxBufferSize},
+    };
+  }
+
   // --------------------
   // JSON deserialization
   // --------------------
@@ -240,14 +321,16 @@ namespace nlohmann
    * Will fail to deserialize if the json object does not "fit" the specified type
    */
   template <typename T, typename... Ts>
-  inline void type_safe_deserialize(const nlohmann::json j, std::variant<Ts...> &v)
+  inline bool type_safe_deserialize(const nlohmann::json j, std::variant<Ts...> &v)
   {
     try
     {
       v = j.get<T>();
+      return true;
     }
     catch (...)
     {
+      return false;
     }
   }
 
@@ -276,46 +359,55 @@ namespace nlohmann
       v = j.get<T>();
   }
 
-  // No easy way to support a generic variant template. Manually specify possible variants here:
+  // No easy way to support a generic variant template.
+  // Manually specify every possible variant here:
   inline void from_json(const nlohmann::json &j, std::variant<int, float, double, long, long long> &v)
   {
-    type_safe_deserialize<int>(j, v);
-    type_safe_deserialize<float>(j, v);
-    type_safe_deserialize<double>(j, v);
-    type_safe_deserialize<long>(j, v);
-    type_safe_deserialize<long long>(j, v);
+    bool _success =
+        type_safe_deserialize<int>(j, v)         ? true
+        : type_safe_deserialize<float>(j, v)     ? true
+        : type_safe_deserialize<double>(j, v)    ? true
+        : type_safe_deserialize<long>(j, v)      ? true
+        : type_safe_deserialize<long long>(j, v) ? true
+                                                 : false;
   }
 
   inline void from_json(const nlohmann::json &j, std::variant<std::vector<std::string>, std::vector<statsig::number>, std::string, statsig::number> &v)
   {
-    type_safe_deserialize<std::vector<std::string>>(j, v);
-    type_safe_deserialize<std::vector<statsig::number>>(j, v);
-    type_safe_deserialize<std::string>(j, v);
-    type_safe_deserialize<statsig::number>(j, v);
+    bool _success =
+        type_safe_deserialize<std::vector<std::string>>(j, v)       ? true
+        : type_safe_deserialize<std::vector<statsig::number>>(j, v) ? true
+        : type_safe_deserialize<std::string>(j, v)                  ? true
+        : type_safe_deserialize<statsig::number>(j, v)              ? true
+                                                                    : false;
   }
 
   inline void from_json(const nlohmann::json &j, std::variant<bool, std::unordered_map<std::string, JSON::any>> &v)
   {
-    type_safe_deserialize<bool>(j, v);
-    type_safe_deserialize<std::unordered_map<std::string, JSON::any>>(j, v);
+    bool _success =
+        type_safe_deserialize<bool>(j, v)                                         ? true
+        : type_safe_deserialize<std::unordered_map<std::string, JSON::any>>(j, v) ? true
+                                                                                  : false;
   }
 
   inline void from_json(const nlohmann::json &j, JSON::any &v)
   {
-    type_safe_deserialize<int>(j, v);
-    type_safe_deserialize<float>(j, v);
-    type_safe_deserialize<double>(j, v);
-    type_safe_deserialize<long>(j, v);
-    type_safe_deserialize<long long>(j, v);
-    type_safe_deserialize<std::string>(j, v);
-    type_safe_deserialize<std::vector<bool>>(j, v);
-    type_safe_deserialize<std::vector<int>>(j, v);
-    type_safe_deserialize<std::vector<float>>(j, v);
-    type_safe_deserialize<std::vector<double>>(j, v);
-    type_safe_deserialize<std::vector<long>>(j, v);
-    type_safe_deserialize<std::vector<long long>>(j, v);
-    type_safe_deserialize<std::vector<std::string>>(j, v);
-    type_safe_deserialize<struct statsig::StatsigMetadata>(j, v);
+    bool _success =
+        type_safe_deserialize<int>(j, v)                               ? true
+        : type_safe_deserialize<float>(j, v)                           ? true
+        : type_safe_deserialize<double>(j, v)                          ? true
+        : type_safe_deserialize<long>(j, v)                            ? true
+        : type_safe_deserialize<long long>(j, v)                       ? true
+        : type_safe_deserialize<std::string>(j, v)                     ? true
+        : type_safe_deserialize<std::vector<bool>>(j, v)               ? true
+        : type_safe_deserialize<std::vector<int>>(j, v)                ? true
+        : type_safe_deserialize<std::vector<float>>(j, v)              ? true
+        : type_safe_deserialize<std::vector<double>>(j, v)             ? true
+        : type_safe_deserialize<std::vector<long>>(j, v)               ? true
+        : type_safe_deserialize<std::vector<long long>>(j, v)          ? true
+        : type_safe_deserialize<std::vector<std::string>>(j, v)        ? true
+        : type_safe_deserialize<struct statsig::StatsigMetadata>(j, v) ? true
+                                                                       : false;
   }
 
   inline void from_json(const nlohmann::json &j, struct statsig::StatsigMetadata &v)
@@ -324,11 +416,35 @@ namespace nlohmann
     key_safe_deserialize(j, "sdkVersion", v.sdkVersion);
   }
 
+  inline void from_json(const nlohmann::json &j, statsig::User &v)
+  {
+    key_safe_deserialize(j, "userID", v.userID);
+    key_safe_deserialize(j, "email", v.email);
+    key_safe_deserialize(j, "ipAddress", v.ipAddress);
+    key_safe_deserialize(j, "userAgent", v.userAgent);
+    key_safe_deserialize(j, "country", v.country);
+    key_safe_deserialize(j, "locale", v.locale);
+    key_safe_deserialize(j, "appVersion", v.appVersion);
+    key_safe_deserialize(j, "custom", v.custom);
+    key_safe_deserialize(j, "privateAttribute", v.privateAttribute);
+    key_safe_deserialize(j, "statsigEnvironment", v.statsigEnvironment);
+    key_safe_deserialize(j, "customIDs", v.customIDs);
+  }
+
   inline void from_json(const nlohmann::json &j, statsig::DynamicConfig &v)
   {
     key_safe_deserialize(j, "name", v.name);
     key_safe_deserialize(j, "value", v.value);
     key_safe_deserialize(j, "ruleID", v.ruleID);
+  }
+
+  inline void from_json(const nlohmann::json &j, statsig::Event &v)
+  {
+    key_safe_deserialize(j, "eventName", v.eventName);
+    key_safe_deserialize(j, "user", v.user);
+    key_safe_deserialize(j, "value", v.value);
+    key_safe_deserialize(j, "metadata", v.metadata);
+    key_safe_deserialize(j, "time", v.time);
   }
 
   inline void from_json(const nlohmann::json &j, statsig::ConfigCondition &v)
@@ -433,14 +549,30 @@ namespace statsig
     nlohmann::json j = object;
     return os << j.dump();
   }
+  inline std::ostream &operator<<(std::ostream &os, const statsig::Options &object)
+  {
+    nlohmann::json j = object;
+    return os << j.dump();
+  }
+  inline std::ostream &operator<<(std::ostream &os, const JSON::any &object)
+  {
+    nlohmann::json j = object;
+    return os << j.dump();
+  }
+  inline std::ostream &operator<<(std::ostream &os, const JSON::serializable &object)
+  {
+    nlohmann::json j = object;
+    return os << j.dump();
+  }
   template <typename K, typename V>
   inline std::ostream &operator<<(std::ostream &os, const std::unordered_map<K, V> &map)
   {
     os << "{";
     bool first = true;
-    for (auto const& e : map)
+    for (auto const &e : map)
     {
-      if (!first) {
+      if (!first)
+      {
         os << ", ";
       }
       os << "\"" << e.first << "\": " << e.second;
@@ -453,9 +585,10 @@ namespace statsig
   {
     os << "[";
     bool first = true;
-    for (auto const& e : vec)
+    for (auto const &e : vec)
     {
-      if (!first) {
+      if (!first)
+      {
         os << ", ";
       }
       os << e;

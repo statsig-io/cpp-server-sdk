@@ -5,14 +5,35 @@
 #include <variant>
 #include <vector>
 
-#include <nlohmann/json.hpp>
-
 #include "statsig_metadata.h"
 
 namespace JSON
 {
-  // json::any -- types that are supported by json conversion
-  // We cannot use generic std::any because we need to define how to convert each non-STL type
+  /**
+   * JSON::deserializable
+   * Types that can be deserialized from json (j.get_to(object))
+   * We cannot use generic std::any because we need to define how to convert each non-STL type
+   */
+  using deserializable = std::variant<
+      int,
+      float,
+      double,
+      long,
+      long long,
+      std::string,
+      std::vector<bool>,
+      std::vector<int>,
+      std::vector<float>,
+      std::vector<double>,
+      std::vector<long>,
+      std::vector<long long>,
+      std::vector<std::string>,
+      struct statsig::StatsigMetadata>;
+
+  /**
+   * JSON::any
+   * Types that can be both serialized and deserialized as json
+   */
   using any = std::variant<
       int,
       float,
@@ -37,7 +58,13 @@ namespace statsig
   struct Options
   {
     std::string api;
-    Options() : api("https://statsigapi.net"){};
+    bool localMode;
+    int loggingIntervalMs;
+    int loggingMaxBufferSize;
+    Options() : api("https://statsigapi.net"),
+                localMode(false),
+                loggingIntervalMs(60 * 1000),
+                loggingMaxBufferSize(1000){};
   };
 
   struct User
@@ -53,17 +80,20 @@ namespace statsig
     std::unordered_map<std::string, JSON::any> privateAttribute;
     std::unordered_map<std::string, std::string> statsigEnvironment;
     std::unordered_map<std::string, std::string> customIDs;
-    User() : userID(""),
-             email(""),
-             ipAddress(""),
-             userAgent(""),
-             country(""),
-             locale(""),
-             appVersion(""),
-             custom(std::unordered_map<std::string, JSON::any>()),
-             privateAttribute(std::unordered_map<std::string, JSON::any>()),
-             statsigEnvironment(std::unordered_map<std::string, std::string>()),
-             customIDs(std::unordered_map<std::string, std::string>()) {}
+  };
+  inline bool operator==(User const &a, User const &b)
+  {
+    return a.userID == b.userID &&
+           a.email == b.email &&
+           a.ipAddress == b.ipAddress &&
+           a.userAgent == b.userAgent &&
+           a.country == b.country &&
+           a.locale == b.locale &&
+           a.appVersion == b.appVersion &&
+           a.custom == b.custom &&
+           a.privateAttribute == b.privateAttribute &&
+           a.statsigEnvironment == b.statsigEnvironment &&
+           a.customIDs == b.customIDs;
   };
 
   struct DynamicConfig
@@ -80,6 +110,7 @@ namespace statsig
     std::string value;
     std::unordered_map<std::string, std::string> metadata;
     int time;
+    std::vector<std::unordered_map<std::string, std::string>> secondaryExposures;
   };
 
   struct EvalResult
@@ -92,6 +123,7 @@ namespace statsig
     std::vector<std::unordered_map<std::string, std::string>> undelegatedSecondaryExposures;
     std::optional<std::vector<std::string>> explicitParameters;
     bool isExperimentGroup;
+    std::string configDelegate;
   };
 
   struct ConfigCondition
@@ -133,4 +165,31 @@ namespace statsig
     std::optional<bool> isActive;
     std::optional<bool> hasSharedParams;
   };
+}
+
+namespace JSON
+{
+  /**
+   * JSON::serializable
+   * types that can be serialized to json (j = object)
+   * Must be distinguished from JSON::deserializable due to circuluar dependency
+   * (e.g. serializing Event -> user -> custom -> JSON::any
+   */
+  using serializable = std::variant<
+      int,
+      float,
+      double,
+      long,
+      long long,
+      std::string,
+      statsig::Event,
+      std::vector<bool>,
+      std::vector<int>,
+      std::vector<float>,
+      std::vector<double>,
+      std::vector<long>,
+      std::vector<long long>,
+      std::vector<std::string>,
+      std::vector<statsig::Event>,
+      struct statsig::StatsigMetadata>;
 }

@@ -6,26 +6,22 @@ namespace statsig
 {
   void Statsig::initialize(std::string sdkKey)
   {
-    std::cout << "Initializing" << std::endl;
     if (isInitialized())
     {
       std::cout << "Statsig already initialized" << std::endl;
       return;
     }
     this->client = new Client(sdkKey);
-    std::cout << "Initialized" << std::endl;
   }
 
   void Statsig::initialize(std::string sdkKey, Options options)
   {
-    std::cout << "Initializing" << std::endl;
     if (isInitialized())
     {
       std::cout << "Statsig already initialized" << std::endl;
       return;
     }
     this->client = new Client(sdkKey, options);
-    std::cout << "Initialized" << std::endl;
   }
 
   bool Statsig::checkGate(User user, std::string gate)

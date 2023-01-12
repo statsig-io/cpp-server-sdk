@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <any>
 #include <map>
 #include <optional>
@@ -7,6 +8,8 @@
 #include <variant>
 
 #include <boost/beast/core/detail/base64.hpp>
+#include <boost/chrono.hpp>
+#include <boost/thread.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -129,6 +132,12 @@ namespace statsig
       void *encoded = malloc(boost::beast::detail::base64::encoded_size(size));
       boost::beast::detail::base64::encode(encoded, &str, size);
       return (long long)encoded;
+    }
+
+    static boost::thread spawnBackgroundThread(std::function<void()> fn)
+    {
+      boost::thread thread(fn);
+      return thread;
     }
   };
 }

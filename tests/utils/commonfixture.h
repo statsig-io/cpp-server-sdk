@@ -9,9 +9,13 @@ protected:
   statsig::Statsig statsig;
   statsig::Options options;
   std::string sdkKey;
+  CommonFixture() {
+    sdkKey = std::getenv("test_api_key");
+    options.localMode = true;
+  }
   void SetUp() override
   {
-    sdkKey = std::getenv("test_api_key");
+    std::cout << "initializing with options " << options << std::endl;
     statsig.initialize(sdkKey, options);
   }
   void TearDown() override
