@@ -7,10 +7,10 @@
 
 namespace statsig
 {
-  class Client
+  class Server
   {
   public:
-    Client(std::string sdkKey, Options options = Options())
+    Server(std::string sdkKey, Options options = Options())
     {
       this->sdkKey = sdkKey;
       this->options = options;

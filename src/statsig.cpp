@@ -11,7 +11,7 @@ namespace statsig
       std::cout << "Statsig already initialized" << std::endl;
       return;
     }
-    this->client = new Client(sdkKey);
+    this->instance = new Server(sdkKey);
   }
 
   void Statsig::initialize(std::string sdkKey, Options options)
@@ -21,7 +21,7 @@ namespace statsig
       std::cout << "Statsig already initialized" << std::endl;
       return;
     }
-    this->client = new Client(sdkKey, options);
+    this->instance = new Server(sdkKey, options);
   }
 
   bool Statsig::checkGate(User user, std::string gate)
@@ -30,7 +30,7 @@ namespace statsig
     {
       throw StatsigNotInitializedError();
     }
-    return client->checkGate(user, gate);
+    return instance->checkGate(user, gate);
   }
 
   DynamicConfig Statsig::getConfig(User user, std::string config)
@@ -39,12 +39,12 @@ namespace statsig
     {
       throw StatsigNotInitializedError();
     }
-    return client->getConfig(user, config);
+    return instance->getConfig(user, config);
   }
 
   bool Statsig::isInitialized()
   {
-    return this->client;
+    return this->instance;
   }
 
   void Statsig::shutdown()
@@ -54,7 +54,7 @@ namespace statsig
       std::cout << "Statsig not initialized" << std::endl;
       return;
     }
-    this->client->shutdown();
-    this->client = NULL;
+    this->instance->shutdown();
+    this->instance = NULL;
   }
 }

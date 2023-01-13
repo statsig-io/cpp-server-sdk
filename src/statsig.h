@@ -1,6 +1,6 @@
 #pragma once
 
-#include "client.h"
+#include "server.h"
 #include "evaluator.h"
 #include "types.h"
 #include <nlohmann/json.hpp>
@@ -12,7 +12,7 @@ namespace statsig
   class Statsig
   {
   public:
-    Statsig() : client(NULL){};
+    Statsig() : instance(NULL){};
     void initialize(std::string sdkKey);
     void initialize(std::string sdkKey, Options options);
     bool checkGate(User user, std::string gate);
@@ -21,6 +21,6 @@ namespace statsig
     bool isInitialized();
 
   private:
-    Client *client;
+    Server *instance;
   };
 }
