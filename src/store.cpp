@@ -4,7 +4,12 @@ namespace statsig
 {
   void Store::initialize() { Store::fetchConfigSpecs(); }
 
-  void Store::shutdown() {}
+  void Store::shutdown() {
+    if (this->syncBgThread)
+    {
+      this->syncBgThread.value().detach();
+    }
+  }
 
   std::optional<ConfigSpec> Store::getGate(std::string gateName)
   {
@@ -83,5 +88,14 @@ namespace statsig
       }
     }
     return experimentToLayer;
+  }
+
+  void Store::sync()
+  {
+    while (true)
+    {
+      boost::this_thread::sleep_for(boost::chrono::milliseconds(this->options.rulesetsSyncIntervalMs));
+      fetchConfigSpecs();
+    }
   }
 }

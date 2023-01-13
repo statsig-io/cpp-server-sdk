@@ -14,33 +14,46 @@
 #define TESTS_DIR "/"
 #endif
 
+struct Counter
+{
+  int downloadConfigSpecs;
+  int logEvent;
+};
+
 class HttpFixture : public CommonFixture
 {
+public:
+  const int TIME_BUFFER = 5; // MS buffer for requests
 protected:
   httplib::Server server;
   std::string host = "localhost";
   int port = 8000;
   std::vector<statsig::Event> logEvents;
+  Counter counter;
   HttpFixture() : CommonFixture()
   {
     this->options.localMode = false;
     this->options.api = "http://" + this->host + ":" + std::to_string(this->port);
+    this->logEvents = std::vector<statsig::Event>();
+    this->counter = Counter{};
   }
   void SetUp() override
   {
-    server.Post("/v1/download_config_specs", [](const httplib::Request &req, httplib::Response &res)
+    server.Post("/v1/download_config_specs", [this](const httplib::Request &req, httplib::Response &res)
                 {
         std::string path = std::string(TESTS_DIR) + "/testdata/download_config_specs.json";
         std::ifstream file(path);
         nlohmann::json j = nlohmann::json::parse(file);
         res.body = j.dump();
-        res.status = 200; });
+        res.status = 200; 
+        this->counter.downloadConfigSpecs ++; });
 
-    server.Post("/v1/log_event", [&](const httplib::Request &req, httplib::Response &res)
+    server.Post("/v1/log_event", [this](const httplib::Request &req, httplib::Response &res)
                 { 
       nlohmann::json j = nlohmann::json::parse(req.body);
       auto events = j.at("events").get<std::vector<statsig::Event>>();
-      this->logEvents.insert(this->logEvents.end(), events.begin(), events.end()); });
+      this->logEvents.insert(this->logEvents.end(), events.begin(), events.end()); 
+      this->counter.logEvent ++; });
 
     statsig::Utils::spawnBackgroundThread([this]()
                                           { server.listen(this->host, this->port); });

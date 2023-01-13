@@ -69,6 +69,6 @@ TEST_F(PeriodicLoggerFixture, PeriodicFlush)
   statsig.getConfig(this->user, "test_config");
   EXPECT_EQ(this->logEvents.size(), 0);
 
-  boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
+  boost::this_thread::sleep_for(boost::chrono::milliseconds(100 + HttpFixture::TIME_BUFFER));
   EXPECT_EQ(this->logEvents.size(), 2);
 }

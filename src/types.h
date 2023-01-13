@@ -59,10 +59,12 @@ namespace statsig
   {
     std::string api;
     bool localMode;
+    int rulesetsSyncIntervalMs;
     int loggingIntervalMs;
     int loggingMaxBufferSize;
     Options() : api("https://statsigapi.net"),
                 localMode(false),
+                rulesetsSyncIntervalMs(10 * 1000),
                 loggingIntervalMs(60 * 1000),
                 loggingMaxBufferSize(1000){};
   };
