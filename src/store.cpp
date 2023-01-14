@@ -13,22 +13,22 @@ namespace statsig
 
   std::optional<ConfigSpec> Store::getGate(std::string gateName)
   {
-    return Utils::safeGetMap<std::string, ConfigSpec>(this->featureGates, gateName);
+    return Utils::safeGetMap(this->featureGates, gateName);
   }
 
   std::optional<ConfigSpec> Store::getConfig(std::string configName)
   {
-    return Utils::safeGetMap<std::string, ConfigSpec>(this->dynamicConfigs, configName);
+    return Utils::safeGetMap(this->dynamicConfigs, configName);
   }
 
   std::optional<ConfigSpec> Store::getLayer(std::string layerName)
   {
-    return Utils::safeGetMap<std::string, ConfigSpec>(this->layerConfigs, layerName);
+    return Utils::safeGetMap(this->layerConfigs, layerName);
   }
 
   std::optional<std::string> Store::getExperimentLayer(std::string experimentName)
   {
-    return Utils::safeGetMap<std::string, std::string>(this->experimentToLayer, experimentName);
+    return Utils::safeGetMap(this->experimentToLayer, experimentName);
   }
 
   void Store::fetchConfigSpecs()

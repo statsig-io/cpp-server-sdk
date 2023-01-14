@@ -25,9 +25,9 @@ namespace statsig
 
   class Utils
   {
-  public:
+  private:
     template <typename K, typename V>
-    static std::optional<V> safeGetMap(Map<K, V> map, K key)
+    static std::optional<V> safeGetMapGeneric(Map<K, V> map, K key)
     {
       try
       {
@@ -53,6 +53,25 @@ namespace statsig
       {
         return std::nullopt;
       }
+    };
+  public:
+    // Individually defined to allow type inference
+    template <typename K, typename V>
+    static std::optional<V> safeGetMap(std::map<K, V> map, K key)
+    {
+      return Utils::safeGetMapGeneric<K, V>(map, key);
+    };
+
+    template <typename K, typename V>
+    static std::optional<V> safeGetMap(std::unordered_map<K, V> map, K key)
+    {
+      return Utils::safeGetMapGeneric<K, V>(map, key);
+    };
+
+    template <typename K, typename V>
+    static std::optional<V> safeGetMap(std::multimap<K, V> map, K key)
+    {
+      return Utils::safeGetMapGeneric<K, V>(map, key);
     };
 
     template <typename T, typename... Ts>

@@ -23,7 +23,7 @@ struct Counter
 class HttpFixture : public CommonFixture
 {
 public:
-  const int TIME_BUFFER = 5; // MS buffer for requests
+  const int TIME_BUFFER = 10; // MS buffer for requests
 protected:
   httplib::Server server;
   std::string host = "localhost";

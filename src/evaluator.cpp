@@ -4,6 +4,11 @@ namespace statsig
 {
   EvalResult Evaluator::checkGate(User user, std::string gate)
   {
+    auto override = checkForGateOverrides(user, gate);
+    if (override)
+    {
+      return override.value();
+    }
     auto maybeSpec = this->store->getGate(gate);
     if (!maybeSpec)
     {
@@ -16,6 +21,11 @@ namespace statsig
 
   EvalResult Evaluator::getConfig(User user, std::string config)
   {
+    auto override = checkForConfigOverrides(user, config);
+    if (override)
+    {
+      return override.value();
+    }
     auto maybeSpec = this->store->getConfig(config);
     if (!maybeSpec)
     {
@@ -29,7 +39,8 @@ namespace statsig
   {
     std::vector<std::unordered_map<std::string, std::string>> exposures;
     std::unordered_map<std::string, JSON::any> defaultValue;
-    std::optional<std::unordered_map<std::string, JSON::any>> defaultJson = Utils::typeSafeGet<std::unordered_map<std::string, JSON::any>>(spec.defaultValue);
+    std::optional<std::unordered_map<std::string, JSON::any>> defaultJson =
+        Utils::typeSafeGet<std::unordered_map<std::string, JSON::any>>(spec.defaultValue);
     if (defaultJson)
     {
       nlohmann::json j = defaultJson.value();
@@ -59,7 +70,8 @@ namespace statsig
           return delegatedResult.value();
         }
         bool pass = evalPassPercentage(user, rule, spec);
-        std::unordered_map<std::string, JSON::any> configValue = pass ? result.configValue : defaultValue;
+        std::unordered_map<std::string, JSON::any> configValue =
+            pass ? result.configValue : defaultValue;
         return EvalResult{
             false, pass, configValue, result.ruleID, exposures, exposures, spec.explicitParameters,
             false};
@@ -91,7 +103,8 @@ namespace statsig
       }
     }
     std::unordered_map<std::string, JSON::any> returnValue;
-    std::optional<std::unordered_map<std::string, JSON::any>> defaultJson = Utils::typeSafeGet<std::unordered_map<std::string, JSON::any>>(rule.returnValue);
+    std::optional<std::unordered_map<std::string, JSON::any>> defaultJson =
+        Utils::typeSafeGet<std::unordered_map<std::string, JSON::any>>(rule.returnValue);
     if (defaultJson)
     {
       nlohmann::json j = defaultJson.value();
@@ -131,7 +144,13 @@ namespace statsig
                          gateResult.secondaryExposures.end());
       }
       bool pass = type == "PASS_GATE" ? gateResult.booleanValue : !gateResult.booleanValue;
-      return EvalResult{gateResult.fetchFromServer, pass, std::unordered_map<std::string, JSON::any>(), "", exposures, exposures};
+      return EvalResult{
+          gateResult.fetchFromServer,
+          pass,
+          std::unordered_map<std::string, JSON::any>(),
+          "",
+          exposures,
+          exposures};
     }
     else if (type == "IP_BASED")
     {
@@ -395,22 +414,22 @@ namespace statsig
     std::string valueAsString = Utils::typeSafeGet<std::string>(value).value_or("");
     if (valueAsString == "")
     {
-      if (auto customValue = Utils::safeGetMap<std::string, JSON::any>(user.custom, field))
+      if (auto customValue = Utils::safeGetMap(user.custom, field))
       {
         value = customValue;
       }
       else if (auto customValue =
-                   Utils::safeGetMap<std::string, JSON::any>(user.custom, fieldLower))
+                   Utils::safeGetMap(user.custom, fieldLower))
       {
         value = customValue;
       }
       else if (auto privateValue =
-                   Utils::safeGetMap<std::string, JSON::any>(user.privateAttribute, field))
+                   Utils::safeGetMap(user.privateAttribute, field))
       {
         value = privateValue;
       }
       else if (auto privateValue =
-                   Utils::safeGetMap<std::string, JSON::any>(user.privateAttribute, fieldLower))
+                   Utils::safeGetMap(user.privateAttribute, fieldLower))
       {
         value = privateValue;
       }
@@ -432,17 +451,159 @@ namespace statsig
     std::string idTypeLower = boost::algorithm::to_lower_copy(idType);
     if (idType != "" && idTypeLower != "userid")
     {
-      if (auto customID = Utils::safeGetMap<std::string, JSON::any>(user.custom, idType); customID)
+      if (auto customID = Utils::safeGetMap(user.custom, idType); customID)
       {
         return Utils::typeSafeGet<std::string>(customID).value_or("");
       }
-      if (auto customID = Utils::safeGetMap<std::string, JSON::any>(user.custom, idTypeLower);
+      if (auto customID = Utils::safeGetMap(user.custom, idTypeLower);
           customID)
       {
         return Utils::typeSafeGet<std::string>(customID).value_or("");
       }
     }
     return user.userID;
+  }
+
+  void Evaluator::overrideGate(std::string gateName, bool value, std::optional<std::string> userID)
+  {
+    auto *gateOverrides = &this->overrides.gates[gateName];
+    std::string key = userID ? userID.value() : "";
+    (*gateOverrides)[key] = value;
+  }
+
+  void Evaluator::overrideConfig(std::string configName,
+                                 std::unordered_map<std::string, JSON::deserializable> value,
+                                 std::optional<std::string> userID)
+  {
+    auto *configOverrides = &this->overrides.configs[configName];
+    std::string key = userID ? userID.value() : "";
+    (*configOverrides)[key] = value;
+  }
+
+  void Evaluator::overrideLayer(std::string layerName,
+                                std::unordered_map<std::string, JSON::deserializable> value,
+                                std::optional<std::string> userID)
+  {
+    auto *layerOverrides = &this->overrides.layers[layerName];
+    std::string key = userID ? userID.value() : "";
+    (*layerOverrides)[key] = value;
+  }
+
+  void Evaluator::removeGateOverride(std::string gateName, std::optional<std::string> userID)
+  {
+    auto maybeGateOverrides = Utils::safeGetMap(this->overrides.gates, gateName);
+    if (!maybeGateOverrides)
+    {
+      return;
+    }
+    auto gateOverrides = maybeGateOverrides.value();
+    std::string key = userID ? userID.value() : "";
+    if (key == "")
+    {
+      this->overrides.gates[gateName].clear();
+    }
+    if (gateOverrides.find(key) != gateOverrides.end())
+    {
+      this->overrides.gates[gateName].erase(key);
+    }
+  }
+
+  void Evaluator::removeConfigOverride(std::string configName, std::optional<std::string> userID)
+  {
+    auto maybeConfigOverrides = Utils::safeGetMap(this->overrides.configs, configName);
+    if (!maybeConfigOverrides)
+    {
+      return;
+    }
+    auto configOverrides = maybeConfigOverrides.value();
+    std::string key = userID ? userID.value() : "";
+    if (key == "")
+    {
+      this->overrides.configs[configName].clear();
+    }
+    if (configOverrides.find(key) != configOverrides.end())
+    {
+      this->overrides.configs[configName].erase(key);
+    }
+  }
+
+  void Evaluator::removeLayerOverride(std::string layerName, std::optional<std::string> userID)
+  {
+    auto maybeLayerOverrides = Utils::safeGetMap(this->overrides.layers, layerName);
+    if (!maybeLayerOverrides)
+    {
+      return;
+    }
+    auto layerOverrides = maybeLayerOverrides.value();
+    std::string key = userID ? userID.value() : "";
+    if (key == "")
+    {
+      this->overrides.layers[layerName].clear();
+    }
+    if (layerOverrides.find(key) != layerOverrides.end())
+    {
+      this->overrides.layers[layerName].erase(key);
+    }
+  }
+
+  std::optional<EvalResult> Evaluator::checkForGateOverrides(User user, std::string gateName)
+  {
+    auto gateOverrides = Utils::safeGetMap(this->overrides.gates, gateName);
+    if (!gateOverrides)
+    {
+      return std::nullopt;
+    }
+    auto userOverride = Utils::safeGetMap(gateOverrides.value(), user.userID);
+    if (userOverride)
+    {
+      return EvalResult{false, userOverride.value(), std::unordered_map<std::string, JSON::any>(), "override"};
+    }
+    auto allOverride = Utils::safeGetMap(gateOverrides.value(), std::string());
+    if (allOverride)
+    {
+      return EvalResult{false, allOverride.value(), std::unordered_map<std::string, JSON::any>(), "override"};
+    }
+    return std::nullopt;
+  }
+
+  std::optional<EvalResult> Evaluator::checkForConfigOverrides(User user, std::string configName)
+  {
+    auto configOverrides = Utils::safeGetMap(this->overrides.configs, configName);
+    if (!configOverrides)
+    {
+      return std::nullopt;
+    }
+    auto userOverride = Utils::safeGetMap(configOverrides.value(), user.userID);
+    if (userOverride)
+    {
+      return EvalResult{false, true, userOverride.value(), "override"};
+    }
+    auto allOverride = Utils::safeGetMap(configOverrides.value(), std::string());
+    if (allOverride)
+    {
+      return EvalResult{false, true, allOverride.value(), "override"};
+    }
+    return std::nullopt;
+  }
+
+  std::optional<EvalResult> Evaluator::checkForLayerOverrides(User user, std::string layerName)
+  {
+    auto layerOverrides = Utils::safeGetMap(this->overrides.layers, layerName);
+    if (!layerOverrides)
+    {
+      return std::nullopt;
+    }
+    auto userOverride = Utils::safeGetMap(layerOverrides.value(), user.userID);
+    if (userOverride)
+    {
+      return EvalResult{false, true, userOverride.value(), "override"};
+    }
+    auto allOverride = Utils::safeGetMap(layerOverrides.value(), std::string());
+    if (allOverride)
+    {
+      return EvalResult{false, true, allOverride.value(), "override"};
+    }
+    return std::nullopt;
   }
 
   void Evaluator::shutdown()

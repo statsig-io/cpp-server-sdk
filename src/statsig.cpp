@@ -42,6 +42,114 @@ namespace statsig
     return instance->getConfig(user, config);
   }
 
+  void Statsig::overrideGate(std::string gateName, bool value)
+  {
+    if (!isInitialized())
+    {
+      throw StatsigNotInitializedError();
+    }
+    this->instance->overrideGate(gateName, value);
+  }
+
+  void Statsig::overrideGate(std::string gateName, bool value, std::string userID)
+  {
+    if (!isInitialized())
+    {
+      throw StatsigNotInitializedError();
+    }
+    this->instance->overrideGate(gateName, value, userID);
+  }
+
+  void Statsig::overrideConfig(std::string configName, std::unordered_map<std::string, JSON::deserializable> value)
+  {
+    if (!isInitialized())
+    {
+      throw StatsigNotInitializedError();
+    }
+    this->instance->overrideConfig(configName, value);
+  }
+
+  void Statsig::overrideConfig(std::string configName, std::unordered_map<std::string, JSON::deserializable> value, std::string userID)
+  {
+    if (!isInitialized())
+    {
+      throw StatsigNotInitializedError();
+    }
+    this->instance->overrideConfig(configName, value, userID);
+  }
+
+  void Statsig::overrideLayer(std::string layerName, std::unordered_map<std::string, JSON::deserializable> value)
+  {
+    if (!isInitialized())
+    {
+      throw StatsigNotInitializedError();
+    }
+    this->instance->overrideLayer(layerName, value);
+  }
+
+  void Statsig::overrideLayer(std::string layerName, std::unordered_map<std::string, JSON::deserializable> value, std::string userID)
+  {
+    if (!isInitialized())
+    {
+      throw StatsigNotInitializedError();
+    }
+    this->instance->overrideLayer(layerName, value, userID);
+  }
+
+  void Statsig::removeGateOverride(std::string gateName)
+  {
+    if (!isInitialized())
+    {
+      throw StatsigNotInitializedError();
+    }
+    this->instance->removeGateOverride(gateName);
+  }
+
+  void Statsig::removeGateOverride(std::string gateName, std::string userID)
+  {
+    if (!isInitialized())
+    {
+      throw StatsigNotInitializedError();
+    }
+    this->instance->removeGateOverride(gateName, userID);
+  }
+
+  void Statsig::removeConfigOverride(std::string configName)
+  {
+    if (!isInitialized())
+    {
+      throw StatsigNotInitializedError();
+    }
+    this->instance->removeConfigOverride(configName);
+  }
+
+  void Statsig::removeConfigOverride(std::string configName, std::string userID)
+  {
+    if (!isInitialized())
+    {
+      throw StatsigNotInitializedError();
+    }
+    this->instance->removeConfigOverride(configName, userID);
+  }
+
+  void Statsig::removeLayerOverride(std::string layerName)
+  {
+    if (!isInitialized())
+    {
+      throw StatsigNotInitializedError();
+    }
+    this->instance->removeLayerOverride(layerName);
+  }
+
+  void Statsig::removeLayerOverride(std::string layerName, std::string userID)
+  {
+    if (!isInitialized())
+    {
+      throw StatsigNotInitializedError();
+    }
+    this->instance->removeLayerOverride(layerName, userID);
+  }
+
   bool Statsig::isInitialized()
   {
     return this->instance;
