@@ -49,7 +49,7 @@ namespace statsig
     this->logEvent(event);
   }
 
-  void EventLogger::logLayerExposure(User user, std::string layerName, std::string parameterName, EvalResult evaluation, bool isManualExposure)
+  void EventLogger::logLayerExposure(User user, Layer layer, std::string parameterName, EvalResult evaluation, bool isManualExposure)
   {
     std::string allocatedExperiment = "";
     auto exposures = evaluation.undelegatedSecondaryExposures;
@@ -60,14 +60,13 @@ namespace statsig
       exposures = evaluation.secondaryExposures;
       allocatedExperiment = evaluation.configDelegate;
     }
-    Event event{"statsig::config_exposure", user};
+    Event event{"statsig::layer_exposure", user};
     event.metadata = {
-        {"config", layerName},
-        {"ruleID", evaluation.ruleID},
+        {"config", layer.name},
+        {"ruleID", layer.ruleID},
         {"allocatedExperiment", allocatedExperiment},
         {"parameterName", parameterName},
         {"isExplicitParameter", isExplicit ? "true" : "false"},
-
     };
     if (isManualExposure)
     {

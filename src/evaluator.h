@@ -18,8 +18,9 @@ namespace statsig
       this->store = new Store(network, options);
       this->store->initialize();
     };
-    EvalResult checkGate(User user, std::string gate);
-    EvalResult getConfig(User user, std::string config);
+    EvalResult checkGate(User user, std::string gateName);
+    EvalResult getConfig(User user, std::string configName);
+    EvalResult getLayer(User user, std::string layerName);
     void overrideGate(std::string gateName, bool value,
                       std::optional<std::string> userID = std::nullopt);
     void overrideConfig(std::string configName,

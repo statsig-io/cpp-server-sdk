@@ -26,22 +26,26 @@ public:
   const int TIME_BUFFER = 10; // MS buffer for requests
 protected:
   httplib::Server server;
-  std::string host = "localhost";
-  int port = 8000;
+  std::string host;
+  int port;
   std::vector<statsig::Event> logEvents;
   Counter counter;
+  std::string dcsFilePath;
   HttpFixture() : CommonFixture()
   {
+    this->host = "localhost";
+    this->port = 8000;
     this->options.localMode = false;
     this->options.api = "http://" + this->host + ":" + std::to_string(this->port);
     this->logEvents = std::vector<statsig::Event>();
     this->counter = Counter{};
+    this->dcsFilePath = "/testdata/download_config_specs.json";
   }
   void SetUp() override
   {
     server.Post("/v1/download_config_specs", [this](const httplib::Request &req, httplib::Response &res)
                 {
-        std::string path = std::string(TESTS_DIR) + "/testdata/download_config_specs.json";
+        std::string path = std::string(TESTS_DIR) + this->dcsFilePath;
         std::ifstream file(path);
         nlohmann::json j = nlohmann::json::parse(file);
         res.body = j.dump();

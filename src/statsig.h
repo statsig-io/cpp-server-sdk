@@ -1,11 +1,14 @@
 #pragma once
 
-#include "server.h"
-#include "evaluator.h"
-#include "types.h"
+#include <iostream>
+
 #include <nlohmann/json.hpp>
 #include <httplib.h>
-#include <iostream>
+
+#include "evaluator.h"
+#include "layer.h"
+#include "server.h"
+#include "types.h"
 
 namespace statsig
 {
@@ -17,6 +20,7 @@ namespace statsig
     void initialize(std::string sdkKey, Options options);
     bool checkGate(User user, std::string gate);
     DynamicConfig getConfig(User user, std::string config);
+    Layer getLayer(User user, std::string layer);
     void overrideGate(std::string gateName, bool value);
     void overrideGate(std::string gateName, bool value, std::string userID);
     void overrideConfig(std::string configName, std::unordered_map<std::string, JSON::deserializable> value);

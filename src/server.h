@@ -4,6 +4,7 @@
 #include "event_logger.h"
 #include "types.h"
 #include "network.h"
+#include "layer.h"
 
 namespace statsig
 {
@@ -18,8 +19,9 @@ namespace statsig
       this->evaluator = new Evaluator(network, options);
       this->logger = new EventLogger(network, options);
     }
-    bool checkGate(User user, std::string gate);
-    DynamicConfig getConfig(User user, std::string config);
+    bool checkGate(User user, std::string gateName);
+    DynamicConfig getConfig(User user, std::string configName);
+    Layer getLayer(User user, std::string layerName);
     void overrideGate(std::string gateName, bool value, std::optional<std::string> userID = std::nullopt);
     void overrideConfig(std::string configName, std::unordered_map<std::string, JSON::deserializable> value, std::optional<std::string> userID = std::nullopt);
     void overrideLayer(std::string layerName, std::unordered_map<std::string, JSON::deserializable> value, std::optional<std::string> userID = std::nullopt);

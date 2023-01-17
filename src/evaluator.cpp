@@ -2,14 +2,14 @@
 
 namespace statsig
 {
-  EvalResult Evaluator::checkGate(User user, std::string gate)
+  EvalResult Evaluator::checkGate(User user, std::string gateName)
   {
-    auto override = checkForGateOverrides(user, gate);
+    auto override = checkForGateOverrides(user, gateName);
     if (override)
     {
       return override.value();
     }
-    auto maybeSpec = this->store->getGate(gate);
+    auto maybeSpec = this->store->getGate(gateName);
     if (!maybeSpec)
     {
       return EvalResult();
@@ -19,17 +19,33 @@ namespace statsig
     return EvalResult();
   }
 
-  EvalResult Evaluator::getConfig(User user, std::string config)
+  EvalResult Evaluator::getConfig(User user, std::string configName)
   {
-    auto override = checkForConfigOverrides(user, config);
+    auto override = checkForConfigOverrides(user, configName);
     if (override)
     {
       return override.value();
     }
-    auto maybeSpec = this->store->getConfig(config);
+    auto maybeSpec = this->store->getConfig(configName);
     if (!maybeSpec)
     {
       return EvalResult();
+    }
+    auto spec = maybeSpec.value_or(ConfigSpec());
+    return evaluate(user, spec);
+  }
+
+  EvalResult Evaluator::getLayer(User user, std::string layerName)
+  {
+    auto override = checkForLayerOverrides(user, layerName);
+    if (override)
+    {
+      return override.value();
+    }
+    auto maybeSpec = this->store->getLayer(layerName);
+    if (!maybeSpec)
+    {
+      return EvalResult{};
     }
     auto spec = maybeSpec.value_or(ConfigSpec());
     return evaluate(user, spec);
