@@ -43,6 +43,7 @@ namespace statsig
       }
       if (!result.found_entry)
       {
+        std::cout << "No entry found for address: " << ip << std::endl;
       }
       return result;
     };
