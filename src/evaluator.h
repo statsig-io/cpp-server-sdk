@@ -1,5 +1,6 @@
 #pragma once
 
+#include "country_lookup.h"
 #include "evaluator_utils.h"
 #include "network.h"
 #include "store.h"
@@ -17,6 +18,7 @@ namespace statsig
       this->options = options;
       this->store = new Store(network, options);
       this->store->initialize();
+      this->countryLookup = new CountryLookup();
     };
     EvalResult checkGate(User user, std::string gateName);
     EvalResult getConfig(User user, std::string configName);
@@ -38,6 +40,7 @@ namespace statsig
     Network *network;
     Options options;
     Store *store;
+    CountryLookup *countryLookup;
     struct overrides
     {
       std::unordered_map<std::string, std::unordered_map<std::string, bool>> gates;

@@ -176,7 +176,9 @@ namespace statsig
         auto ip = getFromUser(user, "ip");
         if (ip && field == "country")
         {
-          // TODO: country lookup
+          if (const auto *ipString = std::get_if<std::string>(&ip.value())) {
+            value = this->countryLookup->lookupCountry(*ipString);
+          }
         }
       }
       if (!value)

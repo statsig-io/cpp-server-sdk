@@ -22,9 +22,11 @@ set(OPENSSL_ROOT_DIR /opt/homebrew/opt/openssl)
 include(FetchContent)
 include(${CMAKE_FILES}/json.cmake)
 include(${CMAKE_FILES}/httplib.cmake)
+include(${CMAKE_FILES}/maxminddb.cmake)
 
 target_link_libraries(Statsig PUBLIC httplib::httplib)
 target_link_libraries(Statsig PUBLIC nlohmann_json::nlohmann_json)
+target_link_libraries(Statsig PUBLIC maxminddb::maxminddb)
 
 # Find 3rd party packages via CMake Find Modules
 # These are usually included in CMake distribution and don't need to be installed
@@ -60,3 +62,6 @@ target_compile_features(Statsig PUBLIC cxx_std_17)
 if(BUILD_TESTS)
   add_subdirectory(tests)
 endif()
+
+add_definitions( -DPROJECT_ROOT_DIR="${CMAKE_CURRENT_SOURCE_DIR}" )
+message(STATUS "PROJECT_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}")
