@@ -630,7 +630,7 @@ namespace statsig
 
   void Evaluator::shutdown()
   {
-    this->store->shutdown();
-    this->store = NULL;
+    delete this->store;
+    delete this->countryLookup;
   }
 }

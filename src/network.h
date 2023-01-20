@@ -14,6 +14,7 @@ namespace statsig
   {
   public:
     Network(std::string sdkKey, Options options) : sdkKey(sdkKey), api(options.api){};
+    ~Network() { shutdown(); };
     httplib::Result postRequest(std::string endpoint, std::multimap<std::string, JSON::serializable> body);
     httplib::Result postRequest(std::string endpoint, std::string body);
     void shutdown();

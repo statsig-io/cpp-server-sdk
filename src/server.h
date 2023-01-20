@@ -18,7 +18,8 @@ namespace statsig
       this->network = new Network(sdkKey, options);
       this->evaluator = new Evaluator(network, options);
       this->logger = new EventLogger(network, options);
-    }
+    };
+    ~Server() { shutdown(); };
     bool checkGate(User user, std::string gateName);
     DynamicConfig getConfig(User user, std::string configName);
     Layer getLayer(User user, std::string layerName);

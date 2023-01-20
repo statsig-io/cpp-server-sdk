@@ -171,7 +171,6 @@ namespace statsig
       STATSIG_LOG("Statsig not initialized");
       return;
     }
-    this->instance->shutdown();
-    this->instance = NULL;
+    delete this->instance;
   }
 }

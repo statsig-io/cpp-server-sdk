@@ -58,11 +58,8 @@ namespace statsig
 
   void Server::shutdown()
   {
-    this->logger->shutdown();
-    this->network->shutdown();
-    this->evaluator->shutdown();
-    this->logger = NULL;
-    this->network = NULL;
-    this->evaluator = NULL;
+    delete this->logger;
+    delete this->network;
+    delete this->evaluator;
   }
 }

@@ -21,6 +21,7 @@ namespace statsig
       this->store->initialize();
       this->countryLookup = new CountryLookup();
     };
+    ~Evaluator() { shutdown(); };
     EvalResult checkGate(User user, std::string gateName);
     EvalResult getConfig(User user, std::string configName);
     EvalResult getLayer(User user, std::string layerName);

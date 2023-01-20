@@ -26,6 +26,7 @@ namespace statsig
                                                           { sync(); });
       }
     };
+    ~Store() { shutdown(); };
     std::optional<ConfigSpec> getGate(std::string gateName);
     std::optional<ConfigSpec> getConfig(std::string configName);
     std::optional<ConfigSpec> getLayer(std::string layerName);

@@ -22,6 +22,7 @@ namespace statsig
                                                            { periodicFlush(); });
       }
     }
+    ~EventLogger() { shutdown(); };
     void logEvent(Event event);
     void logGateExposure(User user, std::string gateName, EvalResult evaluation, bool isManualExposure);
     void logConfigExposure(User user, std::string configName, EvalResult evaluation, bool isManualExposure);
