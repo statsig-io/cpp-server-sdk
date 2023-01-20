@@ -627,8 +627,4 @@ namespace statsig
       }
     }
   }
-  inline std::ostream &operator<<(std::ostream &os, const std::string &object)
-  {
-    return os << std::boolalpha << "\"" << object << "\"";
-  }
 }

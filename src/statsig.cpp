@@ -8,7 +8,7 @@ namespace statsig
   {
     if (isInitialized())
     {
-      std::cout << "Statsig already initialized" << std::endl;
+      STATSIG_LOG("Statsig already initialized");
       return;
     }
     this->instance = new Server(sdkKey);
@@ -18,7 +18,7 @@ namespace statsig
   {
     if (isInitialized())
     {
-      std::cout << "Statsig already initialized" << std::endl;
+      STATSIG_LOG("Statsig already initialized");
       return;
     }
     this->instance = new Server(sdkKey, options);
@@ -168,7 +168,7 @@ namespace statsig
   {
     if (!isInitialized())
     {
-      std::cout << "Statsig not initialized" << std::endl;
+      STATSIG_LOG("Statsig not initialized");
       return;
     }
     this->instance->shutdown();

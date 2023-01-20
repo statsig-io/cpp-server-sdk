@@ -398,7 +398,7 @@ namespace statsig
 
   std::optional<JSON::any> Evaluator::getFromUser(User user, std::string field)
   {
-    std::optional<JSON::any> value;
+    JSON::any value;
     std::string fieldLower = boost::algorithm::to_lower_copy(field);
     if (fieldLower == "userid" || fieldLower == "user_id")
     {
@@ -434,22 +434,26 @@ namespace statsig
     {
       if (auto customValue = Utils::safeGetMap(user.custom, field))
       {
-        value = customValue;
+        return customValue;
       }
       else if (auto customValue =
                    Utils::safeGetMap(user.custom, fieldLower))
       {
-        value = customValue;
+        return customValue;
       }
       else if (auto privateValue =
                    Utils::safeGetMap(user.privateAttribute, field))
       {
-        value = privateValue;
+        return privateValue;
       }
       else if (auto privateValue =
                    Utils::safeGetMap(user.privateAttribute, fieldLower))
       {
-        value = privateValue;
+        return privateValue;
+      }
+      else
+      {
+        return std::nullopt;
       }
     }
     return value;

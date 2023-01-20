@@ -3,6 +3,7 @@
 #include "country_lookup.h"
 #include "evaluator_utils.h"
 #include "network.h"
+#include "output_logger.h"
 #include "store.h"
 #include "types.h"
 #include "utils.h"

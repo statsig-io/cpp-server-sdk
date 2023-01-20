@@ -7,6 +7,7 @@
 
 #include "evaluator.h"
 #include "layer.h"
+#include "output_logger.h"
 #include "server.h"
 #include "types.h"
 

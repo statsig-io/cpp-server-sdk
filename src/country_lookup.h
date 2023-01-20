@@ -13,6 +13,8 @@
 #include <optional>
 #include <maxminddb.h>
 
+#include "output_logger.h"
+
 namespace statsig
 {
   class CountryLookup
@@ -23,7 +25,7 @@ namespace statsig
       const int status = MMDB_open(filepath.c_str(), MMDB_MODE_MMAP, &this->mmdb);
       if (status != MMDB_SUCCESS)
       {
-        std::cout << "Failed to open the MMDB file: " << filepath << std::endl;
+        STATSIG_LOG("Failed to open the MMDB file:", filepath);
       }
     };
     ~CountryLookup()
@@ -38,13 +40,20 @@ namespace statsig
     {
       MMDB_lookup_result_s result = lookupRaw(ip);
       MMDB_entry_data_s entryData;
-      const int status = MMDB_get_value(&result.entry, &entryData, "country", "iso_code");
-      if (status != MMDB_SUCCESS)
+      const int status = MMDB_get_value(&result.entry, &entryData, "country", "iso_code", NULL);
+      if (status != MMDB_SUCCESS || !entryData.has_data)
       {
-        std::cout << "Failed to get the country code: " << ip << std::endl;
+        STATSIG_LOG("Failed to get the country code of:", ip, "Status:", status);
         return std::nullopt;
       }
-      return std::string(entryData.utf8_string);
+      if (entryData.type != MMDB_DATA_TYPE_UTF8_STRING)
+      {
+        STATSIG_LOG("Country code is not a valid string. Type is", entryData.type);
+        return std::nullopt;
+      }
+      std::string isoCode;
+      isoCode.assign(entryData.utf8_string, entryData.utf8_string + entryData.data_size);
+      return isoCode;
     };
 
   private:
@@ -56,15 +65,15 @@ namespace statsig
       MMDB_lookup_result_s result = MMDB_lookup_string(&this->mmdb, ip.c_str(), &gai_error, &mmdb_error);
       if (gai_error)
       {
-        std::cout << gai_strerror(gai_error) << std::endl;
+        STATSIG_LOG(gai_strerror(gai_error));
       }
       if (mmdb_error)
       {
-        std::cout << "Failed to lookup address: " << ip << std::endl;
+        STATSIG_LOG("Failed to lookup address:", ip);
       }
       if (!result.found_entry)
       {
-        std::cout << "No entry found for address: " << ip << std::endl;
+        STATSIG_LOG("No entry found for address:", ip);
       }
       return result;
     };
