@@ -2,12 +2,12 @@
 #include <statsig.h>
 #include <iostream>
 
-#include "utils/httpfixture.h"
+#include "utils/commonfixture.h"
 
-class CountryLookupFixture : public HttpFixture
+class CountryLookupFixture : public CommonFixture
 {
   protected:
-  CountryLookupFixture() : HttpFixture()
+  CountryLookupFixture() : CommonFixture()
   {
     this->publicUser.ipAddress = "24.18.183.148"; // Seattle, WA (US)
     this->statsigUser.ipAddress = "115.240.90.163"; // Mumbai, India (IN)

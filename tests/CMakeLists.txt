@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.11)
 
+unset(CMAKE_MODULE_PATH CACHE)
+
 include(GoogleTest)
 include(FetchContent)
 include(${CMAKE_FILES}/googletest.cmake)

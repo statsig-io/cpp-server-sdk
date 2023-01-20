@@ -1,15 +1,17 @@
 #pragma once
 
-#include <any>
-#include <iostream>
-#include <optional>
-#include <maxminddb.h>
-
 #ifdef PROJECT_ROOT_DIR
 #define ROOT_DIR PROJECT_ROOT_DIR
 #else
 #define ROOT_DIR "/"
 #endif
+
+#ifdef MAXMINDDB_DEFINED
+
+#include <any>
+#include <iostream>
+#include <optional>
+#include <maxminddb.h>
 
 namespace statsig
 {
@@ -27,25 +29,6 @@ namespace statsig
     ~CountryLookup()
     {
       MMDB_close(&this->mmdb);
-    }
-    MMDB_lookup_result_s lookupRaw(const std::string ip)
-    {
-      int gai_error = 0; // get_address_info error
-      int mmdb_error = 0;
-      MMDB_lookup_result_s result = MMDB_lookup_string(&this->mmdb, ip.c_str(), &gai_error, &mmdb_error);
-      if (gai_error)
-      {
-        std::cout << gai_strerror(gai_error) << std::endl;
-      }
-      if (mmdb_error)
-      {
-        std::cout << "Failed to lookup address: " << ip << std::endl;
-      }
-      if (!result.found_entry)
-      {
-        std::cout << "No entry found for address: " << ip << std::endl;
-      }
-      return result;
     };
     /**
      * Look up which country the given IP address belongs to
@@ -66,5 +49,43 @@ namespace statsig
 
   private:
     MMDB_s mmdb;
+    MMDB_lookup_result_s lookupRaw(const std::string ip)
+    {
+      int gai_error = 0; // get_address_info error
+      int mmdb_error = 0;
+      MMDB_lookup_result_s result = MMDB_lookup_string(&this->mmdb, ip.c_str(), &gai_error, &mmdb_error);
+      if (gai_error)
+      {
+        std::cout << gai_strerror(gai_error) << std::endl;
+      }
+      if (mmdb_error)
+      {
+        std::cout << "Failed to lookup address: " << ip << std::endl;
+      }
+      if (!result.found_entry)
+      {
+        std::cout << "No entry found for address: " << ip << std::endl;
+      }
+      return result;
+    };
   };
 }
+#else
+
+#include <string>
+#include <optional>
+
+namespace statsig
+{
+  class CountryLookup
+  {
+  public:
+    CountryLookup(){};
+    ~CountryLookup(){};
+    std::optional<std::string> lookupCountry(const std::string ip)
+    {
+      return std::nullopt;
+    };
+  };
+}
+#endif
