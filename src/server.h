@@ -23,6 +23,7 @@ namespace statsig
     bool checkGate(User user, std::string gateName);
     DynamicConfig getConfig(User user, std::string configName);
     Layer getLayer(User user, std::string layerName);
+    void logEvent(User user, std::string eventName);
     void overrideGate(std::string gateName, bool value, std::optional<std::string> userID = std::nullopt);
     void overrideConfig(std::string configName, std::unordered_map<std::string, JSON::deserializable> value, std::optional<std::string> userID = std::nullopt);
     void overrideLayer(std::string layerName, std::unordered_map<std::string, JSON::deserializable> value, std::optional<std::string> userID = std::nullopt);
