@@ -7,7 +7,8 @@ namespace statsig
   void Store::shutdown() {
     if (this->syncBgThread)
     {
-      this->syncBgThread.value().detach();
+      this->syncBgThread->interrupt();
+      this->syncBgThread->join();
     }
   }
 

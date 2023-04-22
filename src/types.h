@@ -111,7 +111,7 @@ namespace statsig
     User user;
     std::string value;
     std::unordered_map<std::string, std::string> metadata;
-    int time;
+    long long time;
     std::vector<std::unordered_map<std::string, std::string>> secondaryExposures;
   };
 
