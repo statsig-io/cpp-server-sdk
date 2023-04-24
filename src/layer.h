@@ -3,7 +3,6 @@
 #include <any>
 
 #include "types.h"
-#include "util.h"
 
 namespace statsig
 {

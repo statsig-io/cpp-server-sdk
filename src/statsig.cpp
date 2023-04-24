@@ -42,6 +42,15 @@ namespace statsig
     return instance->getConfig(user, config);
   }
 
+  DynamicConfig Statsig::getExperiment(User user, std::string config)
+  {
+    if (!isInitialized())
+    {
+      throw StatsigNotInitializedError();
+    }
+    return instance->getConfig(user, config);
+  }
+
   Layer Statsig::getLayer(User user, std::string layer)
   {
     if (!isInitialized())

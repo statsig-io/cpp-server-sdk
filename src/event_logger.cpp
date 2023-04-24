@@ -79,7 +79,7 @@ namespace statsig
 
   void EventLogger::flush()
   {
-    if (this->queue.size() == 0)
+    if (this->queue.empty())
     {
       return;
     }
@@ -105,7 +105,8 @@ namespace statsig
     flush();
     if (this->flushBgThread)
     {
-      this->flushBgThread.value().detach();
+      this->flushBgThread->interrupt();
+      this->flushBgThread->join();
     }
   }
 }
