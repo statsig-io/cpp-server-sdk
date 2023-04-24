@@ -51,6 +51,14 @@ namespace statsig
     return instance->getLayer(user, layer);
   }
 
+  void Statsig::logEvent(User user, std::string eventName) {
+    if (!isInitialized())
+    {
+      throw StatsigNotInitializedError();
+    }
+    return instance->logEvent(user, eventName);
+  }
+
   void Statsig::overrideGate(std::string gateName, bool value)
   {
     if (!isInitialized())

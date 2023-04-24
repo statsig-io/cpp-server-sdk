@@ -26,6 +26,11 @@ namespace statsig
     return Layer(layerName, res.configValue, res.ruleID, logFunction);
   }
 
+  void Server::logEvent(User user, std::string eventName) {
+    Event event{eventName, user};
+    this->logger->logEvent(event);
+  }
+
   void Server::overrideGate(std::string gateName, bool value, std::optional<std::string> userID)
   {
     this->evaluator->overrideGate(gateName, value, userID);
