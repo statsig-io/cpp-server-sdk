@@ -39,7 +39,7 @@ namespace statsig
         {"sinceTime", 0},
     };
     auto res = this->network->postRequest("/v1/download_config_specs", body);
-    if (res->status != 200)
+    if (!res || res->status != 200)
     {
       return;
     }

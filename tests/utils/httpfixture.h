@@ -4,7 +4,6 @@
 #include <fstream>
 #include <gtest/gtest.h>
 #include <httplib.h>
-#include <statsig.h>
 
 #include "commonfixture.h"
 

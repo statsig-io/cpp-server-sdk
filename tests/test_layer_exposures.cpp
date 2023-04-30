@@ -16,27 +16,27 @@ class LayerExposuresFixture : public HttpFixture
 
 TEST_F(LayerExposuresFixture, DoesNotLogOnGetLayer)
 {
-  statsig::Layer layer = statsig.getLayer(this->publicUser, "unallocated_layer");
+  statsig::Layer layer = statsig::getLayer(this->publicUser, "unallocated_layer");
   EXPECT_EQ(this->logEvents.size(), 0);
 }
 
 TEST_F(LayerExposuresFixture, DoesNotLogOnInvalidType)
 {
-  statsig::Layer layer = statsig.getLayer(this->publicUser, "unallocated_layer");
+  statsig::Layer layer = statsig::getLayer(this->publicUser, "unallocated_layer");
   layer.get("an_int", std::string());
   EXPECT_EQ(this->logEvents.size(), 0);
 }
 
 TEST_F(LayerExposuresFixture, DoesNotLogOnNonExistentKey)
 {
-  statsig::Layer layer = statsig.getLayer(this->publicUser, "unallocated_layer");
+  statsig::Layer layer = statsig::getLayer(this->publicUser, "unallocated_layer");
   layer.get("a_string", std::string());
   EXPECT_EQ(this->logEvents.size(), 0);
 }
 
 TEST_F(LayerExposuresFixture, UnallocatedLayerLogging)
 {
-  statsig::Layer layer = statsig.getLayer(this->publicUser, "unallocated_layer");
+  statsig::Layer layer = statsig::getLayer(this->publicUser, "unallocated_layer");
   layer.get("an_int", 0);
   EXPECT_EQ(this->logEvents.size(), 1);
   EXPECT_EQ(this->logEvents[0].eventName, "statsig::layer_exposure");
@@ -50,7 +50,7 @@ TEST_F(LayerExposuresFixture, UnallocatedLayerLogging)
 
 TEST_F(LayerExposuresFixture, ExplicitVsImplicitParameterLogging)
 {
-  statsig::Layer layer = statsig.getLayer(this->publicUser, "explicit_vs_implicit_parameter_layer");
+  statsig::Layer layer = statsig::getLayer(this->publicUser, "explicit_vs_implicit_parameter_layer");
   layer.get("an_int", 0);
   layer.get("a_string", std::string());
   EXPECT_EQ(this->logEvents.size(), 2);
