@@ -22,16 +22,20 @@ namespace statsig
   public:
     CountryLookup(std::string filepath = std::string(ROOT_DIR) + "/src/data/GeoLite2-Country.mmdb")
     {
-      this->mmdb = MMDB_s{};
       const int status = MMDB_open(filepath.c_str(), MMDB_MODE_MMAP, &this->mmdb);
       if (status != MMDB_SUCCESS)
       {
+        mmdbInitialized = false;
         STATSIG_ERROR("Failed to open the MMDB file:", filepath);
+      } else {
+        mmdbInitialized = true;
       }
     };
     ~CountryLookup()
     {
-      MMDB_close(&this->mmdb);
+      if (this->mmdbInitialized) {
+        MMDB_close(&this->mmdb);
+      }
     };
     /**
      * Look up which country the given IP address belongs to
@@ -59,6 +63,7 @@ namespace statsig
 
   private:
     MMDB_s mmdb;
+    bool mmdbInitialized;
     MMDB_lookup_result_s lookupRaw(const std::string ip)
     {
       int gai_error = 0; // get_address_info error
