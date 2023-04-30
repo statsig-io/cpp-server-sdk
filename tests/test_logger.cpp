@@ -28,15 +28,15 @@ protected:
 
 TEST_F(ImmediateLoggerFixture, ImmediateFlush)
 {
-  bool passGate = statsig.checkGate(this->publicUser, "always_on_gate");
+  bool passGate = statsig::checkGate(this->publicUser, "always_on_gate");
   EXPECT_TRUE(passGate);
   EXPECT_EQ(this->logEvents.size(), 1);
 
-  bool failGate = statsig.checkGate(this->publicUser, "on_for_statsig_email");
+  bool failGate = statsig::checkGate(this->publicUser, "on_for_statsig_email");
   EXPECT_FALSE(failGate);
   EXPECT_EQ(this->logEvents.size(), 2);
 
-  auto testConfig = statsig.getConfig(this->publicUser, "test_config");
+  auto testConfig = statsig::getConfig(this->publicUser, "test_config");
   EXPECT_EQ(testConfig.name, "test_config");
   EXPECT_EQ(testConfig.ruleID, "default");
   std::unordered_map<std::string, JSON::any> expectedValue = {
@@ -55,10 +55,10 @@ TEST_F(ImmediateLoggerFixture, ImmediateFlush)
 
 TEST_F(PeriodicLoggerFixture, PeriodicFlush)
 {
-  statsig.checkGate(this->publicUser, "always_on_gate");
+  statsig::checkGate(this->publicUser, "always_on_gate");
   EXPECT_EQ(this->logEvents.size(), 0);
 
-  statsig.getConfig(this->publicUser, "test_config");
+  statsig::getConfig(this->publicUser, "test_config");
   EXPECT_EQ(this->logEvents.size(), 0);
 
   boost::this_thread::sleep_for(boost::chrono::milliseconds(100 + HttpFixture::TIME_BUFFER));

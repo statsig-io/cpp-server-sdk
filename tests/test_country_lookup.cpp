@@ -17,8 +17,8 @@ class CountryLookupFixture : public CommonFixture
 TEST_F(CountryLookupFixture, TestCountry)
 {
   // test_country is set to pass for US and CA
-  bool passGate = statsig.checkGate(this->publicUser, "test_country");
+  bool passGate = statsig::checkGate(this->publicUser, "test_country");
   EXPECT_TRUE(passGate);
-  bool failGate = statsig.checkGate(this->statsigUser, "test_country");
+  bool failGate = statsig::checkGate(this->statsigUser, "test_country");
   EXPECT_FALSE(failGate);
 }

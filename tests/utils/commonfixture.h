@@ -6,7 +6,6 @@
 class CommonFixture : public ::testing::Test
 {
 protected:
-  statsig::Statsig statsig;
   statsig::Options options;
   std::string sdkKey;
   statsig::User publicUser;
@@ -22,10 +21,10 @@ protected:
   void SetUp() override
   {
     std::cout << "initializing with options " << options << std::endl;
-    statsig.initialize(sdkKey, options);
+    statsig::initialize(sdkKey, options);
   }
   void TearDown() override
   {
-    statsig.shutdown();
+    statsig::shutdown();
   }
 };
