@@ -22,10 +22,11 @@ namespace statsig
   public:
     CountryLookup(std::string filepath = std::string(ROOT_DIR) + "/src/data/GeoLite2-Country.mmdb")
     {
+      this->mmdb = MMDB_s{};
       const int status = MMDB_open(filepath.c_str(), MMDB_MODE_MMAP, &this->mmdb);
       if (status != MMDB_SUCCESS)
       {
-        STATSIG_LOG("Failed to open the MMDB file:", filepath);
+        STATSIG_ERROR("Failed to open the MMDB file:", filepath);
       }
     };
     ~CountryLookup()
@@ -43,12 +44,12 @@ namespace statsig
       const int status = MMDB_get_value(&result.entry, &entryData, "country", "iso_code", NULL);
       if (status != MMDB_SUCCESS || !entryData.has_data)
       {
-        STATSIG_LOG("Failed to get the country code of:", ip, "Status:", status);
+        STATSIG_ERROR("Failed to get the country code of:", ip, "Status:", status);
         return std::nullopt;
       }
       if (entryData.type != MMDB_DATA_TYPE_UTF8_STRING)
       {
-        STATSIG_LOG("Country code is not a valid string. Type is", entryData.type);
+        STATSIG_ERROR("Country code is not a valid string. Type is", entryData.type);
         return std::nullopt;
       }
       std::string isoCode;
@@ -65,15 +66,15 @@ namespace statsig
       MMDB_lookup_result_s result = MMDB_lookup_string(&this->mmdb, ip.c_str(), &gai_error, &mmdb_error);
       if (gai_error)
       {
-        STATSIG_LOG(gai_strerror(gai_error));
+        STATSIG_ERROR(gai_strerror(gai_error));
       }
       if (mmdb_error)
       {
-        STATSIG_LOG("Failed to lookup address:", ip);
+        STATSIG_ERROR("Failed to lookup address:", ip);
       }
       if (!result.found_entry)
       {
-        STATSIG_LOG("No entry found for address:", ip);
+        STATSIG_ERROR("No entry found for address:", ip);
       }
       return result;
     };
