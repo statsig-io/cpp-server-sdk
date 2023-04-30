@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <variant>
 #include <vector>
+#include <shared_mutex>
 
 #include "statsig_metadata.h"
 
@@ -167,6 +168,9 @@ namespace statsig
     std::optional<bool> isActive;
     std::optional<bool> hasSharedParams;
   };
+
+  typedef std::unique_lock<std::shared_mutex> WLock;
+  typedef std::shared_lock<std::shared_mutex> RLock;
 }
 
 namespace JSON
