@@ -32,8 +32,10 @@ namespace statsig
   private:
     Network *network;
     Options options;
+    std::shared_mutex mu;
     std::vector<Event> queue;
     std::optional<boost::thread> flushBgThread;
+    void enqueue(Event event);
     void flush();
     void periodicFlush();
   };

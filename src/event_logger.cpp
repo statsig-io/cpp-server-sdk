@@ -9,9 +9,11 @@ namespace statsig
       return;
     }
     event.time = Utils::getCurrentTimeMS();
-    this->queue.push_back(event);
+    enqueue(event);
+    RLock rLock(this->mu);
     if (this->queue.size() >= this->options.loggingMaxBufferSize)
     {
+      rLock.unlock();
       flush();
     }
   }
@@ -77,12 +79,20 @@ namespace statsig
     this->logEvent(event);
   }
 
+  void EventLogger::enqueue(Event event) {
+    WLock lock(this->mu);
+    this->queue.push_back(event);
+  }
+
   void EventLogger::flush()
   {
+    RLock rLock(this->mu);
     if (this->queue.empty())
     {
       return;
     }
+    rLock.unlock();
+    WLock wLock(this->mu);
     std::multimap<std::string, JSON::serializable> body = {
         {"events", this->queue},
         {"statsigMetadata", StatsigMetadata},
