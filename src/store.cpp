@@ -63,13 +63,19 @@ namespace statsig
       {
         return;
       }
-      json_safe_deserialize(specsJSON.at("time"), this->lastConfigSyncTime);
-      json_safe_deserialize(specsJSON.at("feature_gates"), this->featureGates);
-      json_safe_deserialize(specsJSON.at("dynamic_configs"), this->dynamicConfigs);
-      json_safe_deserialize(specsJSON.at("layer_configs"), this->layerConfigs);
+      auto newFeatureGates = std::unordered_map<std::string, ConfigSpec>();
+      auto newDynamicConfigs = std::unordered_map<std::string, ConfigSpec>();
+      auto newLayerConfigs = std::unordered_map<std::string, ConfigSpec>();
+      json_safe_deserialize(specsJSON.at("feature_gates"), newFeatureGates);
+      json_safe_deserialize(specsJSON.at("dynamic_configs"), newDynamicConfigs);
+      json_safe_deserialize(specsJSON.at("layer_configs"), newLayerConfigs);
+      this->featureGates = newFeatureGates;
+      this->dynamicConfigs = newDynamicConfigs;
+      this->layerConfigs = newLayerConfigs;
       std::unordered_map<std::string, std::vector<std::string>> layerToExperiments;
       json_safe_deserialize(specsJSON.at("layers"), layerToExperiments);
       this->experimentToLayer = reverseLayerToExperimentsMapping(layerToExperiments);
+      json_safe_deserialize(specsJSON.at("time"), this->lastConfigSyncTime);
     }
     catch (...)
     {
