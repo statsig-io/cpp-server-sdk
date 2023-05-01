@@ -29,6 +29,8 @@ option(STATSIG_BUILD_TESTS "Compile with unit tests" OFF)
 option(STATSIG_INCLUDE_MAXMINDDB "Include the 3rd party library maxminddb. (Disable if country lookup is not needed)" ON)
 ```
 
+__NOTE__: Our SDK requires a minimum c++17 standard version
+
 ## Testing
 
 ### __CMake__
