@@ -36,7 +36,7 @@ namespace statsig
   {
     std::multimap<std::string, JSON::serializable> body = {
         {"statsigMetadata", StatsigMetadata},
-        {"sinceTime", 0},
+        {"sinceTime", this->lastConfigSyncTime},
     };
     auto res = this->network->postRequest("/v1/download_config_specs", body);
     if (!res || res->status != 200)
@@ -63,7 +63,7 @@ namespace statsig
       {
         return;
       }
-
+      json_safe_deserialize(specsJSON.at("time"), this->lastConfigSyncTime);
       json_safe_deserialize(specsJSON.at("feature_gates"), this->featureGates);
       json_safe_deserialize(specsJSON.at("dynamic_configs"), this->dynamicConfigs);
       json_safe_deserialize(specsJSON.at("layer_configs"), this->layerConfigs);
