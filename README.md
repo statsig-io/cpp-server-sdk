@@ -11,7 +11,7 @@ Statsig helps you move faster with Feature Gates (Feature Flags) and Dynamic Con
 ```
 FetchContent_Declare(statsig
         GIT_REPOSITORY    https://github.com/statsig-io/private-cpp-server-sdk.git
-        GIT_TAG           main
+        GIT_TAG           v0.1.0
 )
 
 FetchContent_MakeAvailable(statsig)
