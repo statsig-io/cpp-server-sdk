@@ -20,6 +20,7 @@ namespace statsig
       this->dynamicConfigs = std::unordered_map<std::string, ConfigSpec>();
       this->layerConfigs = std::unordered_map<std::string, ConfigSpec>();
       this->experimentToLayer = std::unordered_map<std::string, std::string>();
+      this->lastConfigSyncTime = 0;
       if (!options.localMode)
       {
         this->syncBgThread = Utils::spawnBackgroundThread([this]()
@@ -41,6 +42,7 @@ namespace statsig
     std::unordered_map<std::string, ConfigSpec> dynamicConfigs;
     std::unordered_map<std::string, ConfigSpec> layerConfigs;
     std::unordered_map<std::string, std::string> experimentToLayer;
+    long long lastConfigSyncTime;
     std::optional<boost::thread> syncBgThread;
     void sync();
     void fetchConfigSpecs();
